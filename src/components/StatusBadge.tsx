@@ -1,13 +1,14 @@
 "use client";
 
 const statusStyles: Record<string, React.CSSProperties> = {
-  pending: { backgroundColor: '#6b7280' },
-  running: { backgroundColor: '#40e0d0', animation: 'pulse-fill 1.5s ease-in-out infinite' },
-  downloading: { backgroundColor: '#40e0d0' },
-  success: { backgroundColor: '#22c55e' },
-  failed: { backgroundColor: '#ef4444' },
-  ok: { backgroundColor: '#22c55e' },
-  no_workers_online: { backgroundColor: '#ef4444' },
+  pending: { backgroundColor: '#6b7280', color: '#ffffff' },
+  running: { backgroundColor: '#40e0d0', color: '#ffffff', animation: 'pulse-fill 1.5s ease-in-out infinite' },
+  downloading: { backgroundColor: '#40e0d0', color: '#ffffff' },
+  success: { backgroundColor: '#22c55e', color: '#ffffff' },
+  partial: { backgroundColor: '#f59e0b', color: '#ffffff' },
+  failed: { backgroundColor: '#ef4444', color: '#ffffff' },
+  ok: { backgroundColor: '#22c55e', color: '#ffffff' },
+  no_workers_online: { backgroundColor: '#ef4444', color: '#ffffff' },
 };
 
 interface StatusBadgeProps {

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { label: "Dashboard", href: "/" },
   { label: "Search", href: "/search" },
   { label: "Jobs", href: "/jobs" },
 ];
@@ -36,20 +35,26 @@ export default function Header() {
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
   useEffect(() => {
-    const interval = setInterval(async () => {
+    const setAllDown = () => {
+      setHealthData({ api: "error", redis: "error", celery_worker: "error", mariadb: "error" });
+    };
+
+    const checkHealth = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/health`);
         if (res.ok) {
           const data = await res.json();
           setHealthData(data.components || {});
+        } else {
+          setAllDown();
         }
-      } catch { /* ignore transient failures */ }
-    }, 1500);
+      } catch {
+        setAllDown();
+      }
+    };
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/health`)
-      .then((res) => res.json())
-      .then((data) => { setHealthData(data.components || {}); })
-      .catch(() => {});
+    const interval = setInterval(checkHealth, 1500);
+    checkHealth();
 
     return () => clearInterval(interval);
   }, []);

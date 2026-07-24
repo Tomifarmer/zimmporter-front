@@ -12,10 +12,10 @@ export default function LightfallBackground() {
       streakCount={6}
       streakWidth={1}
       streakLength={1}
-      glow={0.8}
+      glow={0.6}
       density={0.05}
       twinkle={1}
-      zoom={2}
+      zoom={1.8}
       backgroundGlow={0.3}
       opacity={0.5}
       mouseInteraction={false}
