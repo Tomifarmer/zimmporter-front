@@ -6,6 +6,7 @@ const statusStyles: Record<string, React.CSSProperties> = {
   downloading: { backgroundColor: '#40e0d0', color: '#ffffff' },
   success: { backgroundColor: '#22c55e', color: '#ffffff' },
   partial: { backgroundColor: '#f59e0b', color: '#ffffff' },
+  unavailable: { backgroundColor: '#a855f7', color: '#ffffff' },
   failed: { backgroundColor: '#ef4444', color: '#ffffff' },
   ok: { backgroundColor: '#22c55e', color: '#ffffff' },
   no_workers_online: { backgroundColor: '#ef4444', color: '#ffffff' },

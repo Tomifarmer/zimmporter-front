@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
-import { SearchResponse, SearchResult, DownloadRequest } from "@/types/api";
+import { SearchResponse, SearchResult } from "@/types/api";
 import { api } from "@/lib/api";
 import { InputText } from "primereact/inputtext";
 import { Badge } from "primereact/badge";
@@ -326,10 +326,10 @@ function ResultCard({
         </div>
         <div style={{ padding: '0.75rem 1rem' }}>
           <div className="font-medium text-white" title={result.title} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{result.title}</div>
-          <div className="text-sm text-gray-400" title={artist}>{artist}</div>
-          {result.year && (
-            <div className="text-xs text-gray-500 mt-1">{result.year}</div>
-          )}
+          <div className="text-sm text-gray-400" title={artist} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist}</div>
+          <div className="text-xs text-gray-500 mt-1">
+            {[result.year, result.type, result.trackCount && `${result.trackCount} songs`].filter(Boolean).join(' • ') || '\u00a0'}
+          </div>
         </div>
         <div style={{ padding: '0 1rem 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <label title="Add" style={{ cursor: 'pointer', position: 'relative', width: '1.25rem', height: '1.25rem' }}>

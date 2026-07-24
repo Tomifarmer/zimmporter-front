@@ -11,6 +11,7 @@ export interface SearchResult {
   thumbnail?: string;
   name?: string[];
   subscribers?: string;
+  trackCount?: number;
 }
 
 export interface SearchResponse {
@@ -28,7 +29,7 @@ export interface Song {
   artist: string;
   album: string;
   track_number: number | null;
-  status: "pending" | "downloading" | "success" | "failed";
+  status: "pending" | "downloading" | "success" | "failed" | "unavailable";
   minio_path: string | null;
   error: string | null;
 }
