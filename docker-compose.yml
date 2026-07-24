@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  frontend:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_KEY=${API_KEY:-}
+    depends_on:
+      - api
+
+  # Include the backend services from the API docker-compose
+  # Run: docker compose -f zimmporter-api/docker-compose.yml -f docker-compose.yml up

@@ -1,0 +1,40 @@
+{
+  "name": "zimmporter-front",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.101.2",
+    "axios": "^1.18.1",
+    "bootstrap": "^5.3.8",
+    "lucide-react": "^1.24.0",
+    "ogl": "^1.0.11",
+    "primeflex": "^4.0.0",
+    "primeicons": "^8.0.0",
+    "primereact": "^10.9.8",
+    "react": "19.2.7",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^20",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.11",
+    "next": "^16.2.10",
+    "postcss": "^8.5.10",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3"
+  }
+}

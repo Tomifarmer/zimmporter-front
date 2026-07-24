@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "primereact/resources/primereact.min.css";
+@import "primereact/resources/primereact.min.css";
+@import "primeicons/primeicons.css";
+@import "@/styles/ComponentStyles.css";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: #e2e8f0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.page-container {
+  max-width: 1480px;
+  margin: 50px auto 100px auto;
+  border-radius: 0.5rem;
+  padding: 20px;
+  background-color: #0f172a;
+}
+
+.text-turquoise {
+  color: #0097fb;
+}
+
+/* ──────────────── Header ──────────────── */
+.navbar {
+  background-color: #000000;
+  padding-left: clamp(1.5rem, 4vw, 3.5rem);
+  padding-right: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ──────────────── Search Bar (Dashboard) ──────────────── */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 1rem;
+}
+
+.download-control {
+  max-width: 16rem;
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #334155;
+  color: #e2e8f0;
+  font-size: 0.9375rem;
+}
+
+.download-control:hover {
+  background-color: #475569;
+}
+
+/* ──────────────── Dashboard Section Title ──────────────── */
+.dashboard-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 30px;
+  text-decoration: underline;
+}
+
+/* ──────────────── JobRow (dashboard) ──────────────── */
+.job-row-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  cursor: pointer;
+}
+
+/* ──────────────── Progress Bar (JobRow) ──────────────── */
+.progress-bar-track {
+  width: 100%;
+  height: 2rem;
+  background-color: #0f172a;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+/* ──────────────── Header Health Dot ──────────────── */
+.health-dot-container {
+  position: relative;
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+}
+
+.health-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+}
+
+/* ──────────────── Job Detail Page ──────────────── */
+.job-detail-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.job-detail-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+/* ──────────────── Info Cards (JobDetail) ──────────────── */
+.info-card {
+  padding: 1rem;
+  background-color: #1e3a8a;
+  border-radius: 0.5rem;
+  border: 1px solid #3b82f6;
+}
+
+.info-label {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.info-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-top: 0.5rem;
+  text-transform: capitalize;
+}
+
+/* ──────────────── Songs Table (JobDetail) ──────────────── */
+.songs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.songs-table th, .songs-table td {
+  padding: 0.75rem;
+}
+
+.songs-table th {
+  color: #64748b;
+  border-bottom-color: #1e3a8a;
+}
+
+.songs-table tbody tr:hover {
+  background-color: rgba(64, 224, 208, 0.1);
+  transition: background-color 0.15s ease;
+}
+
+/* ──────────────── Responsive ──────────────── */
+@media (max-width: 768px) {
+  .job-row-expanded.md\:block {
+    display: none;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .detail-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .jobs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Responsive text sizes */
+  .responsive-xs {
+    font-size: 0.875rem;
+  }
+}
+
+/* ──────────────── Responsive table cells ──────────────── */
+.hidden-md-table-cell.md\:table-cell {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hidden-md-table-cell.md\:table-cell {
+    display: table-cell;
+  }
+}
+
+.hidden-lg-table-cell.lg\:table-cell {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .hidden-lg-table-cell.lg\:table-cell {
+    display: table-cell;
+  }
+}
