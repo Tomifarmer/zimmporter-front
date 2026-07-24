@@ -77,7 +77,6 @@ export default function SearchPage() {
     });
   };
 
-  // TODO: Add "select all" button
   const { results } = searchResult.data || { results: [] };
 
   return (
