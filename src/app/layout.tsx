@@ -1,4 +1,13 @@
 import type { Metadata } from "next";
+
+
+
+
+
+
+
+
+import Script from "next/script";
 import * as fs from 'fs';
 import { join } from 'path';
 import Providers from "@/providers/query-provider";
@@ -38,11 +47,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.__RUNTIME_CONFIG__ = ${JSON.stringify(runtimeConfig)};`,
-          }}
-        />
+        <Script id="runtime-config" strategy="beforeInteractive">
+          {`window.__RUNTIME_CONFIG__ = ${JSON.stringify(runtimeConfig)};`}
+        </Script>
         <Header />
         <div className="lightfall-bg-wrapper"><LightfallBackground /></div>
         <Providers>
