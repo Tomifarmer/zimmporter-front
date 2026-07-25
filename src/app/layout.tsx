@@ -8,6 +8,8 @@ import LightfallBackground from "@/components/LightfallBackground";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Zimmporter",
   description: "Music Importer Dashboard",
