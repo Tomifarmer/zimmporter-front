@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { getRuntimeConfig } from "@/lib/config";
 
 const navItems = [
   { label: "Search", href: "/search" },
@@ -40,9 +41,8 @@ export default function Header() {
 
     const checkHealth = async () => {
       try {
-        const cfgRes = await fetch("/api/config");
-        const cfg = await cfgRes.json();
-        const res = await fetch(`${cfg.apiUrl}/health`);
+        const { apiUrl } = getRuntimeConfig();
+        const res = await fetch(`${apiUrl}/health`);
         if (res.ok) {
           const data = await res.json();
           setHealthData(data.components || {});

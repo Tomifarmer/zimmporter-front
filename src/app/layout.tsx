@@ -28,9 +28,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const runtimeConfig = {
+    apiUrl: process.env.API_URL || "http://localhost:8000",
+    apiKey: process.env.API_KEY || "",
+  };
+
   return (
     <html lang="en" className="dark">
       <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__RUNTIME_CONFIG__ = ${JSON.stringify(runtimeConfig)};`,
+          }}
+        />
         <Header />
         <div className="lightfall-bg-wrapper"><LightfallBackground /></div>
         <Providers>
