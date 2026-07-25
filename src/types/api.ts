@@ -30,7 +30,7 @@ export interface Song {
   album: string;
   track_number: number | null;
   status: "pending" | "downloading" | "success" | "failed" | "unavailable";
-  minio_path: string | null;
+  s3_path: string | null;
   error: string | null;
 }
 
