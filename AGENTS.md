@@ -21,6 +21,7 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 - **Dynamic imports** (e.g., `next/dynamic` for PrimeReact Dropdown) are mocked in page test files as needed
 
 ## Project Structure
+- `src/app/api/config/route.ts` — runtime config endpoint (reads `API_URL` and `API_KEY` from server env)
 - `src/app/` — App Router pages (`page.tsx`, `/jobs`, `/search`)
 - `src/components/` — shared UI components
 - `src/lib/api.ts` — single axios client; all API calls go through here
@@ -32,8 +33,8 @@ Path alias: `@/*` maps to `src/*`.
 
 ## Environment Variables
 Set in `.env.local` or docker-compose:
-- `NEXT_PUBLIC_API_URL` — backend address (default `http://localhost:8000`)
-- `NEXT_PUBLIC_API_KEY` — optional API key sent as `X-API-Key` header
+- `API_URL` — backend address (default `http://localhost:8000`, read at runtime via `GET /api/config`)
+- `API_KEY` — optional API key sent as `X-API-Key` header (read at runtime via `GET /api/config`)
 
 Backend sibling repo: `../zimmporter-api`.
 

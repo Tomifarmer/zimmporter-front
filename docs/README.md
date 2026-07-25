@@ -29,10 +29,10 @@ npm run lint   # type-check + lint
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `NEXT_PUBLIC_API_URL` | No | `http://localhost:8000` | Backend API base URL |
-| `NEXT_PUBLIC_API_KEY` | No | `""` | API key (passed as `X-API-Key` header) |
+| `API_URL` | No | `http://localhost:8000` | Backend API base URL (read at runtime via `/api/config`) |
+| `API_KEY` | No | `""` | API key (passed as `X-API-Key` header, read at runtime via `/api/config`) |
 
-Set in `.env.local` for local development, baked in at build time.
+Set in `.env.local` for local development, or via container environment at runtime.
 
 ## Pages
 
@@ -104,8 +104,7 @@ src/
 
 ### API Client (`src/lib/api.ts`)
 
-- Axios instance with `baseURL` from `NEXT_PUBLIC_API_URL`
-- Adds `X-API-Key` header from `NEXT_PUBLIC_API_KEY` if set
+- Axios instance fetches runtime config from `/api/config` (reads `API_URL` / `API_KEY` from server env)
 - Response interceptor normalizes error messages
 
 ### Job Polling (`src/hooks/useJobPolling.ts`)
@@ -120,7 +119,7 @@ Multi-stage Dockerfile produces a standalone Next.js production build:
 
 ```bash
 docker build -t zimmporter-front .
-docker run -p 3000:3000 -e NEXT_PUBLIC_API_URL=http://api:8000 zimmporter-front
+docker run -p 3000:3000 -e API_URL=http://api:8000 zimmporter-front
 ```
 
 Or combined with the backend:

@@ -40,7 +40,9 @@ export default function Header() {
 
     const checkHealth = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/health`);
+        const cfgRes = await fetch("/api/config");
+        const cfg = await cfgRes.json();
+        const res = await fetch(`${cfg.apiUrl}/health`);
         if (res.ok) {
           const data = await res.json();
           setHealthData(data.components || {});

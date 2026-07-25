@@ -1,16 +1,37 @@
 import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "";
+type Config = { apiUrl: string; apiKey: string };
+
+let configPromise: Promise<Config> | null = null;
+
+function getConfig(): Promise<Config> {
+  if (!configPromise) {
+    configPromise = fetch("/api/config")
+      .then((res) => res.json())
+      .then((cfg) => ({
+        apiUrl: cfg.apiUrl || "http://localhost:8000",
+        apiKey: cfg.apiKey || "",
+      }))
+      .catch(() => ({
+        apiUrl: "http://localhost:8000",
+        apiKey: "",
+      }));
+  }
+  return configPromise;
+}
 
 export const api = axios.create({
-  baseURL: API_URL,
   timeout: 30000,
 });
 
-if (API_KEY) {
-  api.defaults.headers.common["X-API-Key"] = API_KEY;
-}
+api.interceptors.request.use(async (config) => {
+  const cfg = await getConfig();
+  config.baseURL = cfg.apiUrl;
+  if (cfg.apiKey) {
+    config.headers["X-API-Key"] = cfg.apiKey;
+  }
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,
