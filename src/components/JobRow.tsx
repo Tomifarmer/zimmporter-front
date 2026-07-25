@@ -25,117 +25,83 @@ export default function JobRow({ job }: { job: JobStatusResponse }) {
   const isSuccess = job.status === "success";
   const displayStatus = isSuccess && job.songs?.some((s) => s.status === "failed") ? "partial" : job.status;
 
+  const cardBorderColor = isFailed ? '#ef4444' : isRunning ? COLORS.turquoise : '#334155';
+  const dotColor = isRunning ? COLORS.turquoise : isSuccess ? '#22c55e' : isFailed ? '#ef4444' : '#475569';
+  const badgeBg = job.job_type === 'album' ? `${COLORS.blue}22` : `${COLORS.turquoise}22`;
+  const badgeColor = job.job_type === 'album' ? COLORS.blue : COLORS.turquoise;
+  const progressColor = isFailed ? '#ef4444' : isSuccess ? '#22c55e' : COLORS.blue;
+
   return (
-    <a
-      href={`/jobs/${job.job_id}`}
-      className="text-decoration-none"
-      style={{ display: 'block' }}
-    >
+    <a href={`/jobs/${job.job_id}`} className="job-row-wrapper text-decoration-none">
       <div
-        style={{
-          backgroundColor: '#1e293b',
-          borderRadius: '0.5rem',
-          border: `1px solid ${isFailed ? '#ef4444' : isRunning ? COLORS.turquoise : '#334155'}`,
-          padding: '1rem',
-          transition: 'border-color 200ms ease, box-shadow 200ms ease',
-          cursor: 'pointer',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = COLORS.blue;
-          e.currentTarget.style.boxShadow = `0 0 8px ${COLORS.blue}33`;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = isFailed ? '#ef4444' : isRunning ? COLORS.turquoise : '#334155';
-          e.currentTarget.style.boxShadow = 'none';
-        }}
+        className="job-row-card"
+        style={{ '--card-border': cardBorderColor } as React.CSSProperties}
       >
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+        <div className="job-row-top-row">
+          <div className="job-row-info-row">
             <div
-              style={{
-                width: '0.625rem',
-                height: '0.625rem',
-                borderRadius: '50%',
-                backgroundColor: isRunning ? COLORS.turquoise : isSuccess ? '#22c55e' : isFailed ? '#ef4444' : '#475569',
-                flexShrink: 0,
-              }}
+              className="job-row-dot"
+              style={{ '--dot-color': dotColor } as React.CSSProperties}
             />
-            <span className="font-bold" style={{ color: '#ffffff', fontSize: '0.9375rem' }}>
+            <span className="job-row-id font-bold">
               Job #{job.job_id}
             </span>
             <span
-              style={{
-                fontSize: '0.6875rem',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                padding: '0.125rem 0.5rem',
-                borderRadius: '0.25rem',
-                backgroundColor: job.job_type === 'album' ? `${COLORS.blue}22` : `${COLORS.turquoise}22`,
-                color: job.job_type === 'album' ? COLORS.blue : COLORS.turquoise,
-              }}
+              className="job-row-type-badge"
+              style={{ '--badge-bg': badgeBg, '--badge-color': badgeColor } as React.CSSProperties}
             >
               {job.job_type}
             </span>
             {job.artist && (
-              <span style={{ color: '#94a3b8', fontSize: '0.8125rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {job.artist}
-              </span>
+              <span className="job-row-artist">{job.artist}</span>
             )}
             {job.album_name && (
-              <span style={{ color: COLORS.turquoise, fontSize: '0.875rem', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {job.album_name}
-              </span>
+              <span className="job-row-album">{job.album_name}</span>
             )}
           </div>
           <StatusBadge status={displayStatus} />
         </div>
 
         {job.total_songs > 0 && (
-          <div style={{ marginBottom: '0.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ flex: '1', height: '0.5rem', backgroundColor: '#0f172a', borderRadius: '999px', overflow: 'hidden' }}>
+          <div className="job-row-progress-section">
+            <div className="job-row-progress-row">
+              <div className="job-row-progress-track">
                 <div
-                  style={{
-                    width: `${pct}%`,
-                    height: '100%',
-                    backgroundColor: isFailed ? '#ef4444' : isSuccess ? '#22c55e' : COLORS.blue,
-                    borderRadius: '999px',
-                    transition: 'width 500ms ease',
-                  }}
+                  className="job-row-progress-fill"
+                  style={{ '--pct': `${pct}%`, '--progress-color': progressColor } as React.CSSProperties}
                 />
               </div>
-              <span className="text-xs text-gray-400" style={{ whiteSpace: 'nowrap' }}>
+              <span className="job-row-fraction text-xs text-gray-400">
                 {job.songs_downloaded}/{job.total_songs}
               </span>
             </div>
           </div>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className="job-row-meta-row">
+          <div className="job-row-meta-left">
             {job.created_at && (
-              <span style={{ color: '#64748b', fontSize: '0.75rem' }}>
+              <span className="job-row-meta-created">
                 Created {relativeTime(job.created_at)}
               </span>
             )}
             {job.updated_at && job.created_at !== job.updated_at && (
-              <span style={{ color: '#475569', fontSize: '0.75rem' }}>
+              <span className="job-row-meta-updated">
                 Updated {relativeTime(job.updated_at)}
               </span>
             )}
           </div>
           {isRunning && (
-            <span style={{ color: COLORS.turquoise, fontSize: '0.6875rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-              <span className="animate-pulse-fill" style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', backgroundColor: COLORS.turquoise, display: 'inline-block' }} />
+            <span className="job-row-running-indicator">
+              <span className="job-row-running-dot animate-pulse-fill" />
               Running
             </span>
           )}
         </div>
 
         {isFailed && job.error && (
-          <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #334155' }}>
-            <span style={{ color: '#fca5a5', fontSize: '0.75rem' }}>{job.error}</span>
+          <div className="job-row-error-section">
+            <span className="job-row-error-text">{job.error}</span>
           </div>
         )}
       </div>

@@ -1,0 +1,22 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 1rem;
+  font-size: 0.8125rem;
+}
+
+.status-badge--pending { background-color: #6b7280; color: #ffffff; }
+.status-badge--running { background-color: #40e0d0; color: #ffffff; animation: pulse-fill 1.5s ease-in-out infinite; }
+.status-badge--downloading { background-color: #40e0d0; color: #ffffff; }
+.status-badge--success { background-color: #22c55e; color: #ffffff; }
+.status-badge--partial { background-color: #f59e0b; color: #ffffff; }
+.status-badge--unavailable { background-color: #a855f7; color: #ffffff; }
+.status-badge--failed { background-color: #ef4444; color: #ffffff; }
+.status-badge--ok { background-color: #22c55e; color: #ffffff; }
+.status-badge--no_workers_online { background-color: #ef4444; color: #ffffff; }
+
+@keyframes pulse-fill {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

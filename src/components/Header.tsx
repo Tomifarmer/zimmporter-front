@@ -13,11 +13,11 @@ function isCurrent(href: string, pathname: string) {
 }
 
 function HealthDot({ name, value }: { name: string; value: string }) {
-  const green = value === "ok";
   return (
     <div className="d-flex align-items-center gap-1 px-2">
       <span
-        style={{ display: 'inline-block', width: '0.75rem', height: '0.75rem', borderRadius: '999px', backgroundColor: green ? "#22c55e" : "#ef4444", transition: 'background-color 150ms ease' }}
+        className="health-dot"
+        style={{ '--dot-color': value === "ok" ? "#22c55e" : "#ef4444" } as React.CSSProperties}
         title={`${name.replace(/_/g, " ")}: ${value}`}
       />
     </div>
@@ -32,7 +32,6 @@ export default function Header() {
     celery_worker: "ok",
     mariadb: "ok",
   });
-  const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
   useEffect(() => {
     const setAllDown = () => {
@@ -60,17 +59,14 @@ export default function Header() {
   }, []);
 
   return (
-    <nav className="d-flex align-items-center px-4 py-3" style={{ backgroundColor: '#000000' }}>
+    <nav className="app-header d-flex align-items-center px-4 py-3">
       <span className="navbar-brand">Zimmporter</span>
       <div className="flex-shrink-0 d-flex gap-3 mx-auto">
-        {navItems.map((item, i) => (
+        {navItems.map((item) => (
           <a
             key={item.href}
             href={item.href}
-
-            onMouseEnter={() => setHoveredIndex(i)}
-            onMouseLeave={() => setHoveredIndex(-1)}
-            style={{ color: '#ffffff', background: 'none', border: 'none', fontSize: '1rem', cursor: 'pointer', textDecoration: 'none', borderBottomWidth: 2, borderBottomStyle: 'solid', borderBottomColor: isCurrent(item.href, pathname) || hoveredIndex === i ? '#ffffff' : 'transparent', paddingBottom: '0.375rem', transition: 'border-color 150ms ease', WebkitTapHighlightColor: 'transparent' }}
+            className={`nav-link-item${isCurrent(item.href, pathname) ? ' nav-link-item--active' : ''}`}
           >
             {item.label}
           </a>

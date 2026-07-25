@@ -52,18 +52,18 @@ export default function JobsPage() {
 
   return (
     <div className="space-y-6">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>Jobs</h1>
+      <div className="jobs-header-row">
+        <h1 className="jobs-title">Jobs</h1>
         {jobsQuery.isFetching && (
-          <span style={{ color: COLORS.turquoise, fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-            <span className="animate-pulse-fill" style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', backgroundColor: COLORS.turquoise, display: 'inline-block' }} />
+          <span className="jobs-refreshing-indicator">
+            <span className="jobs-refreshing-dot animate-pulse-fill" />
             Auto-refreshing
           </span>
         )}
       </div>
 
       {jobs.length > 0 && (
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+        <div className="jobs-stats-row">
           {[
             { label: "Total", value: stats.total, color: COLORS.blue },
             { label: "Running", value: stats.running, color: COLORS.turquoise },
@@ -71,66 +71,54 @@ export default function JobsPage() {
             { label: "Partial", value: stats.partial, color: "#f59e0b" },
             { label: "Failed", value: stats.failed, color: "#ef4444" },
           ].map((stat) => (
-            <div
-              key={stat.label}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 0.75rem',
-                borderRadius: '0.375rem',
-                backgroundColor: '#1e293b',
-                border: `1px solid #334155`,
-              }}
-            >
-              <div style={{ width: '0.5rem', height: '0.5rem', borderRadius: '50%', backgroundColor: stat.color }} />
-              <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>{stat.label}</span>
-              <span style={{ color: '#ffffff', fontSize: '0.875rem', fontWeight: 600 }}>{stat.value}</span>
+            <div key={stat.label} className="jobs-stat-pill">
+              <div className="jobs-stat-dot" style={{ '--stat-color': stat.color } as React.CSSProperties} />
+              <span className="jobs-stat-label">{stat.label}</span>
+              <span className="jobs-stat-value">{stat.value}</span>
             </div>
           ))}
         </div>
       )}
 
       {jobs.length > 0 && (
-        <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '1rem' }}>
-          {FILTER_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => { setPage(0); setStatusFilter(opt.value); }}
-              style={{
-                padding: '0.375rem 0.875rem',
-                borderRadius: '999px',
-                border: `1px solid ${statusFilter === opt.value ? opt.color : '#334155'}`,
-                backgroundColor: statusFilter === opt.value ? `${opt.color}22` : 'transparent',
-                color: statusFilter === opt.value ? opt.color : '#64748b',
-                fontSize: '0.8125rem',
-                fontWeight: statusFilter === opt.value ? 600 : 400,
-                cursor: 'pointer',
-                transition: 'all 150ms ease',
-              }}
-            >
-              {opt.label}
-            </button>
-          ))}
+        <div className="jobs-filter-row">
+          {FILTER_OPTIONS.map((opt) => {
+            const active = statusFilter === opt.value;
+            return (
+              <button
+                key={opt.value}
+                onClick={() => { setPage(0); setStatusFilter(opt.value); }}
+                className="jobs-filter-btn"
+                style={{
+                  '--filter-border': active ? opt.color : '#334155',
+                  '--filter-bg': active ? `${opt.color}22` : 'transparent',
+                  '--filter-color': active ? opt.color : '#64748b',
+                  '--filter-weight': active ? 600 : 400,
+                } as React.CSSProperties}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
       )}
 
       {jobsQuery.isLoading && (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem 0' }}>
-          <i className="pi pi-spin pi-spinner" style={{ fontSize: '2rem', color: COLORS.blue }}></i>
+        <div className="jobs-loading-wrapper">
+          <i className="pi pi-spin pi-spinner jobs-loading-icon" />
         </div>
       )}
 
       {jobsQuery.isError && (
-        <div style={{ padding: '1rem', borderRadius: '0.5rem', backgroundColor: '#1e293b', border: '1px solid #ef4444', color: '#fca5a5', fontSize: '0.875rem' }}>
+        <div className="jobs-error-box">
           {jobsQuery.error.message}
         </div>
       )}
 
       {!jobsQuery.isLoading && !jobsQuery.isError && filteredJobs.length === 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', gap: '1rem' }}>
-          <i className="pi pi-inbox" style={{ fontSize: '3rem', color: '#334155' }}></i>
-          <span style={{ color: '#64748b', fontSize: '0.9375rem' }}>
+        <div className="jobs-empty-state">
+          <i className="pi pi-inbox jobs-empty-icon" />
+          <span className="jobs-empty-text">
             {jobs.length === 0 ? "No jobs yet. Start a download from the search page." : "No jobs match the selected filter."}
           </span>
         </div>
@@ -139,7 +127,7 @@ export default function JobsPage() {
       {filteredJobs.length > 0 && (
         <div>
           {filteredJobs.map((job) => (
-            <div key={job.job_id} style={{ marginBottom: '1rem' }}>
+            <div key={job.job_id} className="jobs-card-wrapper">
               <JobRow job={job} />
             </div>
           ))}
@@ -147,39 +135,33 @@ export default function JobsPage() {
       )}
 
       {jobs.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', paddingTop: '0.5rem' }}>
+        <div className="jobs-pagination-row">
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
+            className="jobs-page-btn"
             style={{
-              padding: '0.375rem 0.875rem',
-              borderRadius: '0.375rem',
-              border: `1px solid ${page === 0 ? '#1e293b' : COLORS.blue}`,
-              backgroundColor: page === 0 ? '#1e293b' : 'transparent',
-              color: page === 0 ? '#475569' : '#ffffff',
-              fontSize: '0.8125rem',
-              cursor: page === 0 ? 'not-allowed' : 'pointer',
-              transition: 'all 150ms ease',
-            }}
+              '--btn-border': page === 0 ? '#1e293b' : COLORS.blue,
+              '--btn-bg': page === 0 ? '#1e293b' : 'transparent',
+              '--btn-color': page === 0 ? '#475569' : '#ffffff',
+              '--btn-cursor': page === 0 ? 'not-allowed' : 'pointer',
+            } as React.CSSProperties}
           >
             Previous
           </button>
-          <span style={{ color: '#64748b', fontSize: '0.8125rem', padding: '0.375rem 0.5rem' }}>
+          <span className="jobs-page-num">
             Page {page + 1}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={jobs.length < limit}
+            className="jobs-page-btn"
             style={{
-              padding: '0.375rem 0.875rem',
-              borderRadius: '0.375rem',
-              border: `1px solid ${jobs.length < limit ? '#1e293b' : COLORS.blue}`,
-              backgroundColor: jobs.length < limit ? '#1e293b' : 'transparent',
-              color: jobs.length < limit ? '#475569' : '#ffffff',
-              fontSize: '0.8125rem',
-              cursor: jobs.length < limit ? 'not-allowed' : 'pointer',
-              transition: 'all 150ms ease',
-            }}
+              '--btn-border': jobs.length < limit ? '#1e293b' : COLORS.blue,
+              '--btn-bg': jobs.length < limit ? '#1e293b' : 'transparent',
+              '--btn-color': jobs.length < limit ? '#475569' : '#ffffff',
+              '--btn-cursor': jobs.length < limit ? 'not-allowed' : 'pointer',
+            } as React.CSSProperties}
           >
             Next
           </button>

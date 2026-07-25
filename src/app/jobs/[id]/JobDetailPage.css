@@ -1,0 +1,276 @@
+.jd-back-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.jd-back-link {
+  color: #64748b;
+  font-size: 0.8125rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.jd-back-icon {
+  font-size: 0.75rem;
+}
+
+.jd-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.jd-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #40e0d0;
+  margin: 0;
+}
+
+.jd-polling-indicator {
+  color: #40e0d0;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.jd-polling-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background-color: #40e0d0;
+  display: inline-block;
+}
+
+.jd-info-cards-row {
+  margin-bottom: 1rem;
+}
+
+.jd-progress-section {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  margin-bottom: 1rem;
+}
+
+.jd-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.jd-progress-label {
+  color: #64748b;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.jd-progress-pct {
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.jd-progress-track {
+  flex: 1;
+  height: 0.625rem;
+  background-color: #0f172a;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.jd-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  width: var(--pct, 0%);
+  background-color: var(--progress-color, #3b82f6);
+  transition: width 500ms ease;
+}
+
+.jd-error-box {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #1e293b;
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  font-size: 0.8125rem;
+  margin-bottom: 1rem;
+}
+
+.jd-error-label {
+  font-weight: 600;
+}
+
+.jd-retry-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.jd-retry-btn {
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  border: 2px solid #f59e0b;
+  background-color: var(--retry-bg, transparent);
+  color: #f59e0b;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: var(--retry-cursor, pointer);
+  opacity: var(--retry-opacity, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 150ms ease;
+}
+
+.jd-retry-spinner {
+  font-size: 0.75rem;
+}
+
+.jd-refresh-icon {
+  font-size: 0.75rem;
+}
+
+.jd-table-wrapper {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid #334155;
+  margin-bottom: 1rem;
+}
+
+.jd-table-scroll {
+  overflow-x: auto;
+}
+
+.jd-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.jd-table-header {
+  background-color: #1e293b;
+  border-bottom: 1px solid #334155;
+}
+
+.jd-table-th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  color: #64748b;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.jd-table-row {
+  border-bottom: 1px solid #1e293b;
+  transition: background-color 150ms ease;
+}
+
+.jd-table-row:nth-child(even) {
+  background-color: #1e293b;
+}
+
+.jd-table-row:nth-child(odd) {
+  background-color: #162135;
+}
+
+.jd-table-row:hover {
+  background-color: #1e3a5f;
+}
+
+.jd-table-td {
+  padding: 0.75rem 1rem;
+}
+
+.jd-table-td--track {
+  color: #475569;
+  white-space: nowrap;
+}
+
+.jd-table-td--title {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.jd-table-td--artist-mobile {
+  color: #64748b;
+  font-size: 0.75rem;
+  display: none;
+}
+
+.jd-table-td--artist-desktop {
+  padding: 0.75rem 1rem;
+  color: #94a3b8;
+  display: none;
+}
+
+.jd-table-td--status {
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+
+.jd-table-td--error {
+  padding: 0.75rem 1rem;
+  color: #fca5a5;
+  font-size: 0.75rem;
+  display: none;
+}
+
+.jd-table-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.jd-empty-state {
+  color: #64748b;
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.jd-timestamps-row {
+  display: flex;
+  gap: 1.5rem;
+  color: #475569;
+  font-size: 0.75rem;
+}
+
+.info-box {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+}
+
+.info-box-label {
+  color: #64748b;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.info-box-value {
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+@media (min-width: 768px) {
+  .jd-table-td--artist-desktop { display: table-cell; }
+  .jd-table-td--artist-mobile { display: none; }
+}
+
+@media (min-width: 992px) {
+  .jd-table-td--error { display: table-cell; }
+}

@@ -17,7 +17,7 @@ const appVersion = JSON.parse(fs.readFileSync(join(process.cwd(), 'package.json'
 
 function StickyFooter({ version }: { version: string }) {
   return (
-    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10 }}>
+    <div className="sticky-footer-wrapper">
       <Footer version={version} />
     </div>
   );
@@ -30,9 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body style={{ backgroundColor: '#0f172a', position: 'relative' }}>
+      <body>
         <Header />
-        <div style={{ position: 'absolute', inset: 0, zIndex: -1 }}><LightfallBackground /></div>
+        <div className="lightfall-bg-wrapper"><LightfallBackground /></div>
         <Providers>
           <PageContainer>{children}</PageContainer>
         </Providers>
