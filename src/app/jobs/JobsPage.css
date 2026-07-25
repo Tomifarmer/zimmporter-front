@@ -46,10 +46,11 @@
 }
 
 .jobs-stat-dot {
+  --stat-color: #3b82f6;
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  background-color: var(--stat-color, #3b82f6);
+  background-color: var(--stat-color);
 }
 
 .jobs-stat-label {
@@ -70,13 +71,17 @@
 }
 
 .jobs-filter-btn {
+  --filter-border: #334155;
+  --filter-bg: transparent;
+  --filter-color: #64748b;
+  --filter-weight: 400;
   padding: 0.375rem 0.875rem;
   border-radius: 999px;
-  border: 1px solid var(--filter-border, #334155);
-  background-color: var(--filter-bg, transparent);
-  color: var(--filter-color, #64748b);
+  border: 1px solid var(--filter-border);
+  background-color: var(--filter-bg);
+  color: var(--filter-color);
   font-size: 0.8125rem;
-  font-weight: var(--filter-weight, 400);
+  font-weight: var(--filter-weight);
   cursor: pointer;
   transition: all 150ms ease;
 }
@@ -133,13 +138,17 @@
 }
 
 .jobs-page-btn {
+  --btn-border: #1e293b;
+  --btn-bg: #1e293b;
+  --btn-color: #475569;
+  --btn-cursor: not-allowed;
   padding: 0.375rem 0.875rem;
   border-radius: 0.375rem;
-  border: 1px solid var(--btn-border, #1e293b);
-  background-color: var(--btn-bg, #1e293b);
-  color: var(--btn-color, #475569);
+  border: 1px solid var(--btn-border);
+  background-color: var(--btn-bg);
+  color: var(--btn-color);
   font-size: 0.8125rem;
-  cursor: var(--btn-cursor, not-allowed);
+  cursor: var(--btn-cursor);
   transition: all 150ms ease;
 }
 

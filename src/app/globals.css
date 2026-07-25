@@ -4,11 +4,11 @@
 @import "primereact/resources/primereact.min.css";
 @import "primeicons/primeicons.css";
 
-@import "@/components/Footer.css";
-@import "@/components/Header.css";
-@import "@/components/StatusBadge.css";
-@import "@/components/JobRow.css";
-@import "@/components/Lightfall.css";
+@import "@/components/Footer/Footer.css";
+@import "@/components/Header/Header.css";
+@import "@/components/StatusBadge/StatusBadge.css";
+@import "@/components/JobRow/JobRow.css";
+@import "@/components/Lightfall/Lightfall.css";
 @import "@/app/not-found.css";
 @import "@/app/jobs/JobsPage.css";
 @import "@/app/jobs/[id]/JobDetailPage.css";

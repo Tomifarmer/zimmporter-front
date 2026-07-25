@@ -89,10 +89,12 @@
 }
 
 .jd-progress-fill {
+  --pct: 0%;
+  --progress-color: #3b82f6;
   height: 100%;
   border-radius: 999px;
-  width: var(--pct, 0%);
-  background-color: var(--progress-color, #3b82f6);
+  width: var(--pct);
+  background-color: var(--progress-color);
   transition: width 500ms ease;
 }
 
@@ -117,15 +119,18 @@
 }
 
 .jd-retry-btn {
+  --retry-bg: transparent;
+  --retry-cursor: pointer;
+  --retry-opacity: 1;
   padding: 0.5rem 1.5rem;
   border-radius: 0.5rem;
   border: 2px solid #f59e0b;
-  background-color: var(--retry-bg, transparent);
+  background-color: var(--retry-bg);
   color: #f59e0b;
   font-size: 0.8125rem;
   font-weight: 600;
-  cursor: var(--retry-cursor, pointer);
-  opacity: var(--retry-opacity, 1);
+  cursor: var(--retry-cursor);
+  opacity: var(--retry-opacity);
   display: flex;
   align-items: center;
   gap: 0.5rem;

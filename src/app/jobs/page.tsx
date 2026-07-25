@@ -28,7 +28,7 @@ export default function JobsPage() {
       const { data } = await api.get<JobStatusResponse[]>("/jobs", {
         params: { limit, offset: page * limit },
       });
-      return data;
+      return data.sort((a, b) => b.job_id - a.job_id);
     },
     refetchInterval: 5000,
   });
