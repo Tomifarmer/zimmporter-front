@@ -22,7 +22,8 @@
     "primereact": "^10.9.8",
     "react": "19.2.7",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "19.2.7"
+    "react-dom": "19.2.7",
+    "sharp": "^0.35.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
@@ -37,7 +38,7 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.2.11",
     "jsdom": "^29.1.1",
-    "next": "^16.2.10",
+    "next": "^16.2.11",
     "postcss": "^8.5.10",
     "typescript": "^5",
     "vitest": "^4.1.10"
