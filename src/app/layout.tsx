@@ -1,12 +1,4 @@
 import type { Metadata } from "next";
-
-
-
-
-
-
-
-
 import Script from "next/script";
 import * as fs from 'fs';
 import { join } from 'path';
