@@ -255,9 +255,9 @@ function ResultCard({
           )}
         </div>
         <div className="result-card-body">
-          <div className="font-medium text-white result-card-title" title={result.title}>{result.title}</div>
-          <div className="text-sm text-gray-400 result-card-artist" title={artist}>{artist}</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="result-card-title" title={result.title}>{result.title}</div>
+          <div className="result-card-artist" title={artist}>{artist}</div>
+          <div className="result-card-meta">
             {[result.year, result.type, result.trackCount && `${result.trackCount} songs`].filter(Boolean).join(' • ') || '\u00a0'}
           </div>
         </div>

@@ -12,7 +12,6 @@ Web interface for the Zimmporter music import API. Built with Next.js 15, TypeSc
 | PrimeReact | 10.9.8 |
 | TanStack Query | 5.101.2 |
 | Axios | 1.18.1 |
-| Tailwind CSS | 4 |
 | PrimeIcons | 8.0.0 |
 
 ## Quick Start
@@ -87,7 +86,7 @@ src/
     search/page.tsx         # Search page
     jobs/page.tsx           # Jobs list page
     jobs/[id]/page.tsx      # Job detail page
-    globals.css             # Tailwind CSS imports
+    globals.css             # CSS imports
   components/
     Header.tsx              # Navigation bar
     StatusBadge.tsx         # Color-coded status pill

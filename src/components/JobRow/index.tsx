@@ -43,7 +43,7 @@ export default function JobRow({ job }: { job: JobStatusResponse }) {
               className="job-row-dot"
               style={{ '--dot-color': dotColor } as React.CSSProperties}
             />
-            <span className="job-row-id font-bold">
+            <span className="job-row-id">
               Job #{job.job_id}
             </span>
             <span
@@ -71,7 +71,7 @@ export default function JobRow({ job }: { job: JobStatusResponse }) {
                   style={{ '--pct': `${pct}%`, '--progress-color': progressColor } as React.CSSProperties}
                 />
               </div>
-              <span className="job-row-fraction text-xs text-gray-400">
+              <span className="job-row-fraction">
                 {job.songs_downloaded}/{job.total_songs}
               </span>
             </div>
