@@ -1,11 +1,11 @@
-FROM node:20-alpine AS builder
+FROM node:26-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:26-alpine
 RUN apk upgrade --no-cache && \
     rm -rf /usr/local/lib/node_modules/npm /opt/yarn* && \
     adduser -D -H -u 51010 appuser
