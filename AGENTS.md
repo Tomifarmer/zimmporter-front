@@ -8,9 +8,17 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 |---|---|
 | `npm run dev` | Dev server on localhost:3000 |
 | `npm run build` | Production build |
-| `npm run lint` | ESLint (no test or typecheck scripts) |
+| `npm run lint` | ESLint |
+| `npm run test` | Vitest (single run) |
+| `npm run test:watch` | Vitest (watch mode) |
+| `npm run test:coverage` | Vitest with coverage |
 
-No test framework is configured. Don't look for one.
+## Tests
+- **Framework:** Vitest + React Testing Library + jsdom
+- **API mocking:** `src/lib/api.ts` is auto-mocked via `vi.mock` in `src/__tests__/helpers/api-mock.ts`
+- **Mock factories:** `src/__tests__/helpers/factories.ts` provides builders for `SearchResult`, `JobStatusResponse`, `Song`
+- **Page tests** require a `QueryClient` wrapper — see existing page tests for pattern
+- **Dynamic imports** (e.g., `next/dynamic` for PrimeReact Dropdown) are mocked in page test files as needed
 
 ## Project Structure
 - `src/app/` — App Router pages (`page.tsx`, `/jobs`, `/search`)
