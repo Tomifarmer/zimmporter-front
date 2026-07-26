@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { JobStatusResponse } from "@/types/api";
 import { api } from "@/lib/api";
+import type { JobStatusResponse } from "@/types/api";
 
 export function useJobPolling(jobId: number | undefined) {
   const isRunning = (status: string) => status === "pending" || status === "running";

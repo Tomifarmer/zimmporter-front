@@ -15,10 +15,11 @@ if (cfg.apiKey) {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message =
-      error.response?.data?.detail || error.message || "Request failed";
-    return Promise.reject(new Error(typeof message === "string" ? message : JSON.stringify(message)));
-  }
+    const message = error.response?.data?.detail || error.message || "Request failed";
+    return Promise.reject(
+      new Error(typeof message === "string" ? message : JSON.stringify(message)),
+    );
+  },
 );
 
 export default api;

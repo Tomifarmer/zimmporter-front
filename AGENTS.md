@@ -8,7 +8,9 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 |---|---|
 | `npm run dev` | Dev server on localhost:3000 |
 | `npm run build` | Production build |
-| `npm run lint` | ESLint |
+| `npm run lint` | Biome check (lint + format + imports) |
+| `npm run format` | Biome format --write |
+| `npm run lint:fix` | Biome check --write |
 | `npm run test` | Vitest (single run) |
 | `npm run test:watch` | Vitest (watch mode) |
 | `npm run test:coverage` | Vitest with coverage |

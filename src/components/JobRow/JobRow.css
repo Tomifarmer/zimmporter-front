@@ -8,7 +8,9 @@
   border-radius: 0.5rem;
   border: 1px solid var(--card-border);
   padding: 1rem;
-  transition: border-color 200ms ease, box-shadow 200ms ease;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease;
   cursor: pointer;
 }
 

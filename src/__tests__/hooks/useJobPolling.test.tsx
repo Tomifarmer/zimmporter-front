@@ -1,8 +1,8 @@
-import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useJobPolling } from "@/hooks/useJobPolling";
-import { mockApiGet, clearApiMocks, mockApi } from "@/__tests__/helpers/api-mock";
+import { renderHook, waitFor } from "@testing-library/react";
+import { clearApiMocks, mockApi, mockApiGet } from "@/__tests__/helpers/api-mock";
 import { buildJob } from "@/__tests__/helpers/factories";
+import { useJobPolling } from "@/hooks/useJobPolling";
 
 function createWrapper() {
   const queryClient = new QueryClient({

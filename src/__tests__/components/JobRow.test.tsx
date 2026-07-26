@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import JobRow from "@/components/JobRow";
 import { buildJob } from "@/__tests__/helpers/factories";
+import JobRow from "@/components/JobRow";
 
 describe("JobRow", () => {
   it("renders job ID and type badge", () => {
@@ -45,8 +45,26 @@ describe("JobRow", () => {
     const job = buildJob({
       status: "success",
       songs: [
-        { id: 1, title: "S1", artist: "A", album: "B", track_number: 1, status: "success", s3_path: null, error: null },
-        { id: 2, title: "S2", artist: "A", album: "B", track_number: 2, status: "failed", s3_path: null, error: "err" },
+        {
+          id: 1,
+          title: "S1",
+          artist: "A",
+          album: "B",
+          track_number: 1,
+          status: "success",
+          s3_path: null,
+          error: null,
+        },
+        {
+          id: 2,
+          title: "S2",
+          artist: "A",
+          album: "B",
+          track_number: 2,
+          status: "failed",
+          s3_path: null,
+          error: "err",
+        },
       ],
     });
     render(<JobRow job={job} />);

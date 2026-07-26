@@ -1,4 +1,4 @@
-import type { SearchResult, SearchResponse, Song, JobStatusResponse } from "@/types/api";
+import type { JobStatusResponse, SearchResponse, SearchResult, Song } from "@/types/api";
 
 export function buildSearchResult(overrides?: Partial<SearchResult>): SearchResult {
   return {

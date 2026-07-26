@@ -14,10 +14,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             staleTime: 1000 * 5,
           },
         },
-      })
+      }),
   );
 
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

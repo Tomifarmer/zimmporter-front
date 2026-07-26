@@ -1,12 +1,12 @@
+import * as fs from "node:fs";
+import { join } from "node:path";
 import type { Metadata } from "next";
 import Script from "next/script";
-import * as fs from 'fs';
-import { join } from 'path';
-import Providers from "@/providers/query-provider";
-import Header from "@/components/Header";
-import PageContainer from "@/components/PageContainer";
-import LightfallBackground from "@/components/LightfallBackground";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import LightfallBackground from "@/components/LightfallBackground";
+import PageContainer from "@/components/PageContainer";
+import Providers from "@/providers/query-provider";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: "Music Importer Dashboard",
 };
 
-const appVersion = JSON.parse(fs.readFileSync(join(process.cwd(), 'package.json'), 'utf8')).version;
+const appVersion = JSON.parse(fs.readFileSync(join(process.cwd(), "package.json"), "utf8")).version;
 
 function StickyFooter({ version }: { version: string }) {
   return (
@@ -43,7 +43,9 @@ export default function RootLayout({
           {`window.__RUNTIME_CONFIG__ = ${JSON.stringify(runtimeConfig)};`}
         </Script>
         <Header />
-        <div className="lightfall-bg-wrapper"><LightfallBackground /></div>
+        <div className="lightfall-bg-wrapper">
+          <LightfallBackground />
+        </div>
         <Providers>
           <PageContainer>{children}</PageContainer>
         </Providers>

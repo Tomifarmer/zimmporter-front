@@ -272,10 +272,16 @@
 }
 
 @media (min-width: 768px) {
-  .jd-table-td--artist-desktop { display: table-cell; }
-  .jd-table-td--artist-mobile { display: none; }
+  .jd-table-td--artist-desktop {
+    display: table-cell;
+  }
+  .jd-table-td--artist-mobile {
+    display: none;
+  }
 }
 
 @media (min-width: 992px) {
-  .jd-table-td--error { display: table-cell; }
+  .jd-table-td--error {
+    display: table-cell;
+  }
 }

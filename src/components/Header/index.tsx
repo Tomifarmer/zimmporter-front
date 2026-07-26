@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { getRuntimeConfig } from "@/lib/config";
 
 const navItems = [
@@ -18,7 +18,7 @@ function HealthDot({ name, value }: { name: string; value: string }) {
     <div className="d-flex align-items-center gap-1 px-2">
       <span
         className="health-dot"
-        style={{ '--dot-color': value === "ok" ? "#22c55e" : "#ef4444" } as React.CSSProperties}
+        style={{ "--dot-color": value === "ok" ? "#22c55e" : "#ef4444" } as React.CSSProperties}
         title={`${name.replace(/_/g, " ")}: ${value}`}
       />
     </div>
@@ -68,18 +68,18 @@ export default function Header() {
           <a
             key={item.href}
             href={item.href}
-            className={`nav-link-item${isCurrent(item.href, pathname) ? ' nav-link-item--active' : ''}`}
+            className={`nav-link-item${isCurrent(item.href, pathname) ? " nav-link-item--active" : ""}`}
           >
             {item.label}
           </a>
         ))}
       </div>
       <div className="d-flex align-items-center gap-2">
-        {Object.keys(healthData).length > 0 ? (
-          Object.entries(healthData).map(([name, value], idx) => (
-            <HealthDot key={idx} name={name} value={value as string} />
-          ))
-        ) : null}
+        {Object.keys(healthData).length > 0
+          ? Object.entries(healthData).map(([name, value]) => (
+              <HealthDot key={name} name={name} value={value as string} />
+            ))
+          : null}
       </div>
     </nav>
   );

@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { Renderer, Program, Mesh, Triangle } from 'ogl';
-import './Lightfall.css';
+import { Mesh, Program, Renderer, Triangle } from "ogl";
+import type React from "react";
+import { useEffect, useRef } from "react";
+import "./Lightfall.css";
 
 export interface LightfallProps {
   className?: string;
@@ -30,7 +31,7 @@ type RGB = [number, number, number];
 const MAX_COLORS = 8;
 
 const hexToRGB = (hex: string): RGB => {
-  const c = hex.replace('#', '').padEnd(6, '0');
+  const c = hex.replace("#", "").padEnd(6, "0");
   const r = parseInt(c.slice(0, 2), 16) / 255;
   const g = parseInt(c.slice(2, 4), 16) / 255;
   const b = parseInt(c.slice(4, 6), 16) / 255;
@@ -38,7 +39,7 @@ const hexToRGB = (hex: string): RGB => {
 };
 
 const prepColors = (input?: string[]) => {
-  const base = (input && input.length ? input : ['#A6C8FF', '#5227FF', '#FF9FFC']).slice(0, MAX_COLORS);
+  const base = (input?.length ? input : ["#A6C8FF", "#5227FF", "#FF9FFC"]).slice(0, MAX_COLORS);
   const count = base.length;
   const arr: RGB[] = [];
   for (let i = 0; i < MAX_COLORS; i++) arr.push(hexToRGB(base[Math.min(i, base.length - 1)]));
@@ -195,8 +196,8 @@ const Lightfall: React.FC<LightfallProps> = ({
   className,
   dpr,
   paused = false,
-  colors = ['#A6C8FF', '#5227FF', '#FF9FFC'],
-  backgroundColor = '#0A29FF',
+  colors = ["#A6C8FF", "#5227FF", "#FF9FFC"],
+  backgroundColor = "#0A29FF",
   speed = 0.5,
   streakCount = 2,
   streakWidth = 1,
@@ -211,7 +212,7 @@ const Lightfall: React.FC<LightfallProps> = ({
   mouseStrength = 0.5,
   mouseRadius = 1,
   mouseDampening = 0.15,
-  mixBlendMode
+  mixBlendMode,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -227,17 +228,17 @@ const Lightfall: React.FC<LightfallProps> = ({
     if (!container) return;
 
     const renderer = new Renderer({
-      dpr: dpr ?? (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1),
+      dpr: dpr ?? (typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1),
       alpha: true,
-      antialias: true
+      antialias: true,
     });
     rendererRef.current = renderer;
     const gl = renderer.gl;
     const canvas = gl.canvas as HTMLCanvasElement;
 
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.display = 'block';
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.display = "block";
     container.appendChild(canvas);
 
     const { arr, count, avg } = prepColors(colors);
@@ -269,7 +270,7 @@ const Lightfall: React.FC<LightfallProps> = ({
       uOpacity: { value: opacity },
       uMouseEnabled: { value: mouseInteraction ? 1 : 0 },
       uMouseStrength: { value: mouseStrength },
-      uMouseRadius: { value: mouseRadius }
+      uMouseRadius: { value: mouseRadius },
     };
 
     const program = new Program(gl, { vertex, fragment, uniforms });
@@ -300,7 +301,7 @@ const Lightfall: React.FC<LightfallProps> = ({
       }
     };
     if (mouseInteraction) {
-      canvas.addEventListener('pointermove', onPointerMove);
+      canvas.addEventListener("pointermove", onPointerMove);
     }
 
     const loop = (t: number) => {
@@ -332,21 +333,21 @@ const Lightfall: React.FC<LightfallProps> = ({
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (mouseInteraction) canvas.removeEventListener('pointermove', onPointerMove);
+      if (mouseInteraction) canvas.removeEventListener("pointermove", onPointerMove);
       ro.disconnect();
       if (canvas.parentElement === container) {
         container.removeChild(canvas);
       }
       const callIfFn = (obj: unknown, key: string) => {
         const fn = obj && (obj as Record<string, unknown>)[key];
-        if (typeof fn === 'function') {
+        if (typeof fn === "function") {
           (fn as () => void).call(obj);
         }
       };
-      callIfFn(programRef.current, 'remove');
-      callIfFn(geometryRef.current, 'remove');
-      callIfFn(meshRef.current, 'remove');
-      callIfFn(rendererRef.current, 'destroy');
+      callIfFn(programRef.current, "remove");
+      callIfFn(geometryRef.current, "remove");
+      callIfFn(meshRef.current, "remove");
+      callIfFn(rendererRef.current, "destroy");
       programRef.current = null;
       geometryRef.current = null;
       meshRef.current = null;
@@ -370,15 +371,15 @@ const Lightfall: React.FC<LightfallProps> = ({
     mouseInteraction,
     mouseStrength,
     mouseRadius,
-    mouseDampening
+    mouseDampening,
   ]);
 
   return (
     <div
       ref={containerRef}
-      className={`lightfall-container ${className ?? ''}`}
+      className={`lightfall-container ${className ?? ""}`}
       style={{
-        ...(mixBlendMode && { mixBlendMode: mixBlendMode as React.CSSProperties['mixBlendMode'] })
+        ...(mixBlendMode && { mixBlendMode: mixBlendMode as React.CSSProperties["mixBlendMode"] }),
       }}
     />
   );

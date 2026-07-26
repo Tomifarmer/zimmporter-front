@@ -1,14 +1,14 @@
 "use client";
 
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
-import { SearchResponse, SearchResult } from "@/types/api";
-import { api } from "@/lib/api";
-import { InputText } from "primereact/inputtext";
 import { Badge } from "primereact/badge";
 import { Card } from "primereact/card";
 import type { DropdownChangeEvent } from "primereact/dropdown";
+import { InputText } from "primereact/inputtext";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { api } from "@/lib/api";
+import type { SearchResponse, SearchResult } from "@/types/api";
 
 const Dropdown = dynamic(
   () => import("primereact/dropdown").then((mod) => mod.Dropdown || mod.default),
@@ -47,7 +47,7 @@ export default function SearchPage() {
       const browseIds = Array.from(selected);
       const endpoint = searchType === "albums" ? "/download/album" : "/download/playlist";
       const requests = browseIds.map((id) =>
-        api.post<{ job_id: number; status: string }>(endpoint, { id, concurrent })
+        api.post<{ job_id: number; status: string }>(endpoint, { id, concurrent }),
       );
       const results = await Promise.all(requests);
       return results.map((r) => r.data.job_id);
@@ -79,52 +79,62 @@ export default function SearchPage() {
 
   return (
     <div className="space-y-6">
-        <div className="search-bar-row">
-          <Badge value={searchType === "albums" ? "A" : "P"} title={searchType === "albums" ? "Album selected" : "Playlist selected"} className="search-type-badge" />
-          <div className="search-input-wrapper">
-            <InputText
-              className="search-text-input"
-              value={query}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
-              placeholder="Search for albums or playlists..."
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    setSubmittedQuery(query);
-                    setLimit(LIMIT_DEFAULT);
-                  }
-              }}
-            />
-            <Dropdown
-              className="search-dropdown"
-              value={searchType}
-              options={[
-                { label: "Albums", value: "albums" },
-                { label: "Playlists", value: "playlists" },
-              ]}
-              onChange={(e: DropdownChangeEvent) => setSearchType(e.value as SearchType)}
-              dropdownIcon="pi pi-chevron-down"
-            />
-          </div>
+      <div className="search-bar-row">
+        <Badge
+          value={searchType === "albums" ? "A" : "P"}
+          title={searchType === "albums" ? "Album selected" : "Playlist selected"}
+          className="search-type-badge"
+        />
+        <div className="search-input-wrapper">
+          <InputText
+            className="search-text-input"
+            value={query}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
+            placeholder="Search for albums or playlists..."
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                setSubmittedQuery(query);
+                setLimit(LIMIT_DEFAULT);
+              }
+            }}
+          />
+          <Dropdown
+            className="search-dropdown"
+            value={searchType}
+            options={[
+              { label: "Albums", value: "albums" },
+              { label: "Playlists", value: "playlists" },
+            ]}
+            onChange={(e: DropdownChangeEvent) => setSearchType(e.value as SearchType)}
+            dropdownIcon="pi pi-chevron-down"
+          />
         </div>
+      </div>
 
       {searchResult.isLoading && (
         <div className="search-loading-wrapper">
           <i className="pi pi-spin pi-spinner search-loading-icon" />
         </div>
       )}
-      {searchResult.isError && (
-        <div className="text-red-400">{searchResult.error.message}</div>
-      )}
+      {searchResult.isError && <div className="text-red-400">{searchResult.error.message}</div>}
       {searchResult.isSuccess && results.length === 0 && (
         <div className="search-no-results">No results found.</div>
       )}
 
-      <div className={`results-loading${searchResult.isFetching ? ' is-fetching' : ''}`}>
+      <div className={`results-loading${searchResult.isFetching ? " is-fetching" : ""}`}>
         <div className="row g-3">
           {results.map((result, i) => (
-            <div key={result.browseId || result.videoId} className="col-12 col-sm-6 col-md-4 col-lg-3 result-card-enter" style={{ animationDelay: `${(i % 4) * 50}ms` }}>
-              <ResultCard result={result} checked={selected.has(result.browseId || "")} onChange={() => result.browseId && toggleSelect(result.browseId)} />
+            <div
+              key={result.browseId || result.videoId}
+              className="col-12 col-sm-6 col-md-4 col-lg-3 result-card-enter"
+              style={{ animationDelay: `${(i % 4) * 50}ms` }}
+            >
+              <ResultCard
+                result={result}
+                checked={selected.has(result.browseId || "")}
+                onChange={() => result.browseId && toggleSelect(result.browseId)}
+              />
             </div>
           ))}
         </div>
@@ -133,14 +143,21 @@ export default function SearchPage() {
       {results.length > 0 && limit < LIMIT_MAX && results.length >= limit && (
         <div className="search-load-more-wrapper">
           <button
+            type="button"
             onClick={() => setLimit((prev) => Math.min(prev * 2, LIMIT_MAX))}
             disabled={searchResult.isFetching}
             className="search-load-more-btn"
           >
             {searchResult.isFetching ? (
-              <><i className="pi pi-spin pi-spinner search-btn-icon" />Loading…</>
+              <>
+                <i className="pi pi-spin pi-spinner search-btn-icon" />
+                Loading…
+              </>
             ) : (
-              <><i className="pi pi-plus search-btn-plus" />Load More</>
+              <>
+                <i className="pi pi-plus search-btn-plus" />
+                Load More
+              </>
             )}
           </button>
         </div>
@@ -149,23 +166,26 @@ export default function SearchPage() {
       {results.length > 0 && (
         <>
           <button
+            type="button"
             onClick={handleDownload}
             title="Start download"
             disabled={selected.size === 0 || downloadMutation.isPending}
             className="search-float-btn"
-            style={{
-              backgroundColor: selected.size > 0 ? '#3b82f6' : '#1e293b',
-              cursor: selected.size > 0 && !downloadMutation.isPending ? 'pointer' : 'not-allowed',
-              opacity: selected.size === 0 || downloadMutation.isPending ? 0.5 : 1,
-            } as React.CSSProperties}
+            style={
+              {
+                backgroundColor: selected.size > 0 ? "#3b82f6" : "#1e293b",
+                cursor:
+                  selected.size > 0 && !downloadMutation.isPending ? "pointer" : "not-allowed",
+                opacity: selected.size === 0 || downloadMutation.isPending ? 0.5 : 1,
+              } as React.CSSProperties
+            }
           >
             <i className="pi pi-download search-float-btn-icon" />
-            {selected.size > 0 && (
-              <span className="search-float-badge">{selected.size}</span>
-            )}
+            {selected.size > 0 && <span className="search-float-badge">{selected.size}</span>}
           </button>
 
           <button
+            type="button"
             onClick={() => setShowSettings((prev) => !prev)}
             title="Concurrent downloads"
             className="search-settings-btn"
@@ -178,7 +198,13 @@ export default function SearchPage() {
               <div className="search-settings-content">
                 <span className="search-settings-label">Concurrent downloads</span>
                 <div className="search-settings-slider-row">
-                  <input type="range" min={1} max={8} value={concurrent} onChange={(e) => setConcurrent(Number(e.target.value))} />
+                  <input
+                    type="range"
+                    min={1}
+                    max={8}
+                    value={concurrent}
+                    onChange={(e) => setConcurrent(Number(e.target.value))}
+                  />
                   <span className="search-settings-value">{concurrent}</span>
                 </div>
               </div>
@@ -202,7 +228,10 @@ function ResultCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  const artist = useMemo(() => result.artist?.join(", ") || result.author || "Unknown", [result.artist, result.author]);
+  const artist = useMemo(
+    () => result.artist?.join(", ") || result.author || "Unknown",
+    [result.artist, result.author],
+  );
 
   useEffect(() => {
     if (!result.thumbnail) return;
@@ -222,9 +251,7 @@ function ResultCard({
 
   return (
     <div>
-      <Card
-        className={`result-card h-100${checked ? ' card-glow' : ''}`}
-      >
+      <Card className={`result-card h-100${checked ? " card-glow" : ""}`}>
         <div className="result-card-img-wrapper">
           {result.thumbnail && imageLoaded ? (
             <img
@@ -255,21 +282,39 @@ function ResultCard({
           )}
         </div>
         <div className="result-card-body">
-          <div className="result-card-title" title={result.title}>{result.title}</div>
-          <div className="result-card-artist" title={artist}>{artist}</div>
+          <div className="result-card-title" title={result.title}>
+            {result.title}
+          </div>
+          <div className="result-card-artist" title={artist}>
+            {artist}
+          </div>
           <div className="result-card-meta">
-            {[result.year, result.type, result.trackCount && `${result.trackCount} songs`].filter(Boolean).join(' • ') || '\u00a0'}
+            {[result.year, result.type, result.trackCount && `${result.trackCount} songs`]
+              .filter(Boolean)
+              .join(" • ") || "\u00a0"}
           </div>
         </div>
         <div className="result-card-footer">
           <label title="Add" className="result-card-checkbox-wrapper">
-            <input type="checkbox" checked={checked} onChange={onChange} className="result-card-checkbox-input" />
-            <span className={`result-card-checkbox-custom${checked ? ' result-card-checkbox-custom--checked' : ''}`}>
-              {checked && <span className="result-card-checkmark">{'\u2713'}</span>}
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={onChange}
+              className="result-card-checkbox-input"
+            />
+            <span
+              className={`result-card-checkbox-custom${checked ? " result-card-checkbox-custom--checked" : ""}`}
+            >
+              {checked && <span className="result-card-checkmark">{"\u2713"}</span>}
             </span>
           </label>
           {result.browseId && (
-            <a href={`https://music.youtube.com/browse/${result.browseId}`} target="_blank" rel="noopener noreferrer" title="See on YouTube Music">
+            <a
+              href={`https://music.youtube.com/browse/${result.browseId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="See on YouTube Music"
+            >
               <i className="pi pi-youtube result-card-youtube" />
             </a>
           )}

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { JobStatusResponse } from "@/types/api";
-import { api } from "@/lib/api";
-import { COLORS } from "@/config/colors";
+import { useMemo, useState } from "react";
 import JobRow from "@/components/JobRow";
+import { COLORS } from "@/config/colors";
+import { api } from "@/lib/api";
+import type { JobStatusResponse } from "@/types/api";
 
 type StatusFilter = "all" | "pending" | "running" | "success" | "failed" | "partial";
 
@@ -46,7 +46,8 @@ export default function JobsPage() {
 
   const filteredJobs = useMemo(() => {
     if (statusFilter === "all") return jobs;
-    if (statusFilter === "partial") return jobs.filter((j) => j.songs.some((s) => s.status === "failed"));
+    if (statusFilter === "partial")
+      return jobs.filter((j) => j.songs.some((s) => s.status === "failed"));
     return jobs.filter((j) => j.status === statusFilter);
   }, [jobs, statusFilter]);
 
@@ -72,7 +73,10 @@ export default function JobsPage() {
             { label: "Failed", value: stats.failed, color: "#ef4444" },
           ].map((stat) => (
             <div key={stat.label} className="jobs-stat-pill">
-              <div className="jobs-stat-dot" style={{ '--stat-color': stat.color } as React.CSSProperties} />
+              <div
+                className="jobs-stat-dot"
+                style={{ "--stat-color": stat.color } as React.CSSProperties}
+              />
               <span className="jobs-stat-label">{stat.label}</span>
               <span className="jobs-stat-value">{stat.value}</span>
             </div>
@@ -86,15 +90,21 @@ export default function JobsPage() {
             const active = statusFilter === opt.value;
             return (
               <button
+                type="button"
                 key={opt.value}
-                onClick={() => { setPage(0); setStatusFilter(opt.value); }}
+                onClick={() => {
+                  setPage(0);
+                  setStatusFilter(opt.value);
+                }}
                 className="jobs-filter-btn"
-                style={{
-                  '--filter-border': active ? opt.color : '#334155',
-                  '--filter-bg': active ? `${opt.color}22` : 'transparent',
-                  '--filter-color': active ? opt.color : '#64748b',
-                  '--filter-weight': active ? 600 : 400,
-                } as React.CSSProperties}
+                style={
+                  {
+                    "--filter-border": active ? opt.color : "#334155",
+                    "--filter-bg": active ? `${opt.color}22` : "transparent",
+                    "--filter-color": active ? opt.color : "#64748b",
+                    "--filter-weight": active ? 600 : 400,
+                  } as React.CSSProperties
+                }
               >
                 {opt.label}
               </button>
@@ -109,17 +119,15 @@ export default function JobsPage() {
         </div>
       )}
 
-      {jobsQuery.isError && (
-        <div className="jobs-error-box">
-          {jobsQuery.error.message}
-        </div>
-      )}
+      {jobsQuery.isError && <div className="jobs-error-box">{jobsQuery.error.message}</div>}
 
       {!jobsQuery.isLoading && !jobsQuery.isError && filteredJobs.length === 0 && (
         <div className="jobs-empty-state">
           <i className="pi pi-inbox jobs-empty-icon" />
           <span className="jobs-empty-text">
-            {jobs.length === 0 ? "No jobs yet. Start a download from the search page." : "No jobs match the selected filter."}
+            {jobs.length === 0
+              ? "No jobs yet. Start a download from the search page."
+              : "No jobs match the selected filter."}
           </span>
         </div>
       )}
@@ -137,31 +145,35 @@ export default function JobsPage() {
       {jobs.length > 0 && (
         <div className="jobs-pagination-row">
           <button
+            type="button"
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
             className="jobs-page-btn"
-            style={{
-              '--btn-border': page === 0 ? '#1e293b' : COLORS.blue,
-              '--btn-bg': page === 0 ? '#1e293b' : 'transparent',
-              '--btn-color': page === 0 ? '#475569' : '#ffffff',
-              '--btn-cursor': page === 0 ? 'not-allowed' : 'pointer',
-            } as React.CSSProperties}
+            style={
+              {
+                "--btn-border": page === 0 ? "#1e293b" : COLORS.blue,
+                "--btn-bg": page === 0 ? "#1e293b" : "transparent",
+                "--btn-color": page === 0 ? "#475569" : "#ffffff",
+                "--btn-cursor": page === 0 ? "not-allowed" : "pointer",
+              } as React.CSSProperties
+            }
           >
             Previous
           </button>
-          <span className="jobs-page-num">
-            Page {page + 1}
-          </span>
+          <span className="jobs-page-num">Page {page + 1}</span>
           <button
+            type="button"
             onClick={() => setPage((p) => p + 1)}
             disabled={jobs.length < limit}
             className="jobs-page-btn"
-            style={{
-              '--btn-border': jobs.length < limit ? '#1e293b' : COLORS.blue,
-              '--btn-bg': jobs.length < limit ? '#1e293b' : 'transparent',
-              '--btn-color': jobs.length < limit ? '#475569' : '#ffffff',
-              '--btn-cursor': jobs.length < limit ? 'not-allowed' : 'pointer',
-            } as React.CSSProperties}
+            style={
+              {
+                "--btn-border": jobs.length < limit ? "#1e293b" : COLORS.blue,
+                "--btn-bg": jobs.length < limit ? "#1e293b" : "transparent",
+                "--btn-color": jobs.length < limit ? "#475569" : "#ffffff",
+                "--btn-cursor": jobs.length < limit ? "not-allowed" : "pointer",
+              } as React.CSSProperties
+            }
           >
             Next
           </button>

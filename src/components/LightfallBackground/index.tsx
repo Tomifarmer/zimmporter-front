@@ -1,12 +1,11 @@
 "use client";
 
-import React from "react";
 import Lightfall from "@/components/Lightfall";
 
 export default function LightfallBackground() {
   return (
     <Lightfall
-      colors={['#40e0d0', '#1e3a8a', '#ef4444']}
+      colors={["#40e0d0", "#1e3a8a", "#ef4444"]}
       backgroundColor="#0f172a"
       speed={0.5}
       streakCount={6}

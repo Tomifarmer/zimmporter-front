@@ -1,7 +1,7 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { mockApiGet, mockApiPost, clearApiMocks, mockApi } from "@/__tests__/helpers/api-mock";
+import { clearApiMocks, mockApi, mockApiGet, mockApiPost } from "@/__tests__/helpers/api-mock";
 import { buildSearchResponse, buildSearchResult } from "@/__tests__/helpers/factories";
 
 vi.mock("next/dynamic", () => ({
@@ -100,9 +100,7 @@ describe("SearchPage", () => {
 
   it("toggles selection and shows download badge", async () => {
     const user = userEvent.setup();
-    const results = [
-      buildSearchResult({ browseId: "select-id", title: "Selectable Album" }),
-    ];
+    const results = [buildSearchResult({ browseId: "select-id", title: "Selectable Album" })];
     mockApiGet(buildSearchResponse({ results }));
 
     const SearchPage = await importSearchPage();
@@ -124,9 +122,7 @@ describe("SearchPage", () => {
 
   it("calls download API on download button click", async () => {
     const user = userEvent.setup();
-    const results = [
-      buildSearchResult({ browseId: "dl-id", title: "Download Album" }),
-    ];
+    const results = [buildSearchResult({ browseId: "dl-id", title: "Download Album" })];
     mockApiGet(buildSearchResponse({ results }));
     mockApiPost({ job_id: 99, status: "running" });
 

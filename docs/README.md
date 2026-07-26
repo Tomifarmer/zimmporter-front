@@ -22,7 +22,7 @@ cp .env.example .env.local
 npm install
 npm run dev    # http://localhost:3000
 npm run build  # production build
-npm run lint   # type-check + lint
+npm run lint   # biome check (lint + format + imports)
 ```
 
 ## Environment Variables
