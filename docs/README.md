@@ -79,6 +79,9 @@ Set in `.env.local` for local development, or via container environment at runti
 ## Architecture
 
 ```
+.github/
+  workflows/
+    build.yml               # GitHub Actions: test + build + push to GHCR
 src/
   app/
     layout.tsx              # Server root layout, wraps ClientLayout
@@ -130,6 +133,19 @@ docker compose -f zimmporter-api/docker-compose.yml -f zimmporter-front/docker-c
 ```
 
 The frontend is served on port `3000`, the API on port `8000`.
+
+## CI
+
+GitHub Actions workflow at `.github/workflows/build.yml`:
+
+| Event | Tests | Build | Push image | Trivy scan |
+|---|---|---|---|---|
+| Push `main` | ✅ | — | — | — |
+| Push `feature/*` | ✅ | ✅ | `feature-*` | — |
+| Push tag `v*` | ✅ | ✅ | `latest`, semver | ✅ |
+| PR to `main` | ✅ | — | — | — |
+
+The `test` job runs `npm ci && npm run lint && npm test` on every trigger. The `build` job is gated to only build on tag or `feature/*` pushes; the `latest` and semver tags are only pushed on version tags, never from feature branches.
 
 ## API Models
 
