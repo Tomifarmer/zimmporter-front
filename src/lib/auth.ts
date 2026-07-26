@@ -30,11 +30,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => {
               issuer: process.env.OIDC_ISSUER_URL,
               clientId: process.env.OIDC_CLIENT_ID,
               clientSecret: process.env.OIDC_CLIENT_SECRET ?? "",
-              checks: ["pkce", "state"],
+              checks: ["pkce", "state"] as ("pkce" | "state")[],
               authorization: {
                 params: { scope: "openid email profile" },
               },
-              profile(profile) {
+              // biome-ignore lint/suspicious/noExplicitAny: NextAuth OIDC profile type is `any`
+              profile(profile: any) {
                 return {
                   id: profile.sub,
                   name: profile.name,
@@ -53,7 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => {
         } else if (account?.access_token) {
           token.accessToken = account.access_token;
         } else if (account?.accessToken) {
-          token.accessToken = account.accessToken;
+          token.accessToken = String(account.accessToken);
         }
         if (user?.image) {
           token.picture = user.image;
