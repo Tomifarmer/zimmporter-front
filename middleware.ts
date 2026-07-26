@@ -1,4 +1,4 @@
-import type { NextRequest, NextFetchEvent } from "next/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
 import type { NextAuthRequest } from "next-auth";
 import { auth } from "@/lib/auth";
 
