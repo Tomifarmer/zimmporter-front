@@ -1,17 +1,19 @@
 # Zimmporter Front
 
-Web interface for the Zimmporter music import API. Built with Next.js 15, TypeScript, PrimeReact, and TanStack Query.
+Web interface for the Zimmporter music import API. Built with Next.js 16, TypeScript, PrimeReact, and TanStack Query.
 
 ## Stack
 
 | Package | Version |
 |---------|---------|
-| Next.js | 15.5.6 |
-| React | 19.1.0 |
-| TypeScript | 5 |
-| PrimeReact | 10.9.8 |
-| TanStack Query | 5.101.2 |
-| Axios | 1.18.1 |
+| Next.js | 16.2.11 |
+| React | 19.2.8 |
+| TypeScript | ^6.0.3 |
+| PrimeReact | ^10.9.8 |
+| TanStack Query | ^5.101.4 |
+| Axios | ^1.18.1 |
+| NextAuth | ^5.0.0-beta.32 |
+| Bootstrap | ^5.3.8 |
 | PrimeIcons | 8.0.0 |
 
 ## Quick Start
@@ -37,6 +39,8 @@ npm run lint   # biome check (lint + format + imports)
 | `OIDC_ISSUER_URL` | No | `""` | OIDC issuer URL (e.g. `https://accounts.google.com`) |
 | `OIDC_CLIENT_ID` | No | `""` | OIDC client ID |
 | `OIDC_CLIENT_SECRET` | No | `""` | OIDC client secret |
+| `GITHUB_CLIENT_ID` | No | `""` | GitHub OAuth App client ID |
+| `GITHUB_CLIENT_SECRET` | No | `""` | GitHub OAuth App client secret |
 | `AUTH_SECRET` | No | `"dev-secret-change-in-production"` | NextAuth encryption secret (generate with `openssl rand -base64 32`) |
 
 `USE_SOCIAL_LOGIN` and `USE_SIMPLE_AUTH` cannot both be `true`; the app shows an error overlay if both are enabled.
@@ -64,7 +68,7 @@ Set in `.env.local` for local development, or via container environment at runti
 - Search input (Enter to submit)
 - Albums / Playlists toggle
 - Multi-select results with checkboxes
-- Concurrent downloads slider (1\u201332, default 4)
+- Concurrent downloads slider (1–32, default 4)
 - Select All toggle button
 - Download Selected button sends `POST /download/album` or `/download/playlist`
 - Redirects to job detail page on success
@@ -90,29 +94,59 @@ Set in `.env.local` for local development, or via container environment at runti
 ```
 .github/
   workflows/
-    build.yml               # GitHub Actions: test + build + push to GHCR
+    build.yml                 # GitHub Actions: test + build + push to GHCR
 src/
+  proxy.ts                    # Next.js 16 middleware; redirects to /login when USE_SOCIAL_LOGIN=true
   app/
-    layout.tsx              # Server root layout, wraps ClientLayout
-    page.tsx                # Dashboard page
-    search/page.tsx         # Search page
-    jobs/page.tsx           # Jobs list page
-    jobs/[id]/page.tsx      # Job detail page
-    globals.css             # CSS imports
+    layout.tsx                # Root layout, wraps Providers, injects runtime config
+    globals.css               # CSS imports
+    not-found.tsx             # Custom 404 page
+    (app)/
+      layout.tsx              # App layout — Header, LightfallBackground, PageContainer, Footer, overlays
+      page.tsx                # Dashboard page
+      search/page.tsx         # Search page
+      jobs/page.tsx           # Jobs list page
+      jobs/[id]/page.tsx      # Job detail page
+    (auth)/
+      layout.tsx              # Auth layout (bare, no header)
+      login/page.tsx          # Login page (server)
+      login/client.tsx        # Login page client component
+    api/
+      config/route.ts         # Runtime config endpoint (reads API_URL, API_KEY from server env)
+      auth/[...nextauth]/route.ts  # NextAuth v5 route handler
   components/
-    Header.tsx              # Navigation bar
-    StatusBadge.tsx         # Color-coded status pill
-    HealthCard.tsx          # Health status card
+    Header/                   # Navigation bar (brand, nav links, health dots, avatar)
+    Footer/                   # Sticky footer with version
+    HealthCard/               # Health status card
+    JobRow/                   # Jobs list row with expand
+    Lightfall/                # Lightfall animation component
+    LightfallBackground/      # Full-page animated background
+    PageContainer/            # Constrained page width wrapper
+    StatusBadge/              # Color-coded status pill
+    ApiKeyErrorOverlay.tsx    # Full-page overlay when API key required but missing
+    AuthConflictOverlay.tsx   # Full-page overlay when both USE_SOCIAL_LOGIN and USE_SIMPLE_AUTH are true
+    SocialLoginErrorOverlay.tsx  # Full-page overlay when social login required but no session
   hooks/
-    useJobPolling.ts        # Polling hook (3s while running)
+    useJobPolling.ts          # Polling hook (3s while pending/running)
   lib/
-    api.ts                  # Axios instance, auth interceptor
+    api.ts                    # Axios instance, auth interceptors (X-API-Key + Bearer)
+    auth.ts                   # NextAuth v5 config — OIDC + GitHub providers
+    config.ts                 # RuntimeConfig type with useSocialLogin, useSimpleAuth, apiUrl, apiKey
   providers/
-    client-layout.tsx       # PrimeReactProvider, QueryClientProvider, Header
-    query-provider.tsx      # TanStack Query client setup
+    auth-provider.tsx         # SessionProvider wrapper (conditionally enabled)
+    query-provider.tsx        # TanStack Query provider
   types/
-    api.ts                  # TypeScript interfaces for all API models
+    api.ts                    # TypeScript interfaces for all API models
+    next-auth.d.ts            # NextAuth type augmentation (accessToken on session)
+  config/
+    colors.ts                 # Shared color constants
+    version.ts                # App version from package.json
+  __tests__/                  # Vitest test suite
 ```
+
+### Proxy Middleware (`src/proxy.ts`)
+
+Next.js 16 middleware. When `USE_SOCIAL_LOGIN=true`, redirects unauthenticated users to `/login` for all routes except `/api/auth/*` and `/login`.
 
 ### API Client (`src/lib/api.ts`)
 
@@ -121,10 +155,17 @@ src/
 - Request interceptor adds `Authorization: Bearer` header when an access token is available
 - Response interceptor detects 401 errors and triggers full-page overlays for missing API key or social login session
 
+### Auth (`src/lib/auth.ts`)
+
+NextAuth v5 configuration supporting:
+- **OIDC** — any OpenID Connect provider (Google, etc.)
+- **GitHub** — GitHub OAuth App
+- JWT strategy with `accessToken` passthrough and `picture` propagation from user profile to session
+
 ### Job Polling (`src/hooks/useJobPolling.ts`)
 
 - Uses TanStack Query `refetchInterval` callback
-- Polls every 3s while `status \u2208 {pending, running}`
+- Polls every 3s while `status ∈ {pending, running}`
 - Stops automatically when job completes or fails
 
 ## Docker Build
@@ -162,10 +203,10 @@ The `test` job runs `npm ci && npm run lint && npm test` on every trigger. The `
 
 All types defined in `src/types/api.ts`:
 
-- **SearchResult** \u2014 album/playlist/item from search
-- **SearchResponse** \u2014 array of search results
-- **DownloadRequest** \u2014 id and concurrent fields
-- **JobResponse** \u2014 job_id and status
-- **JobStatusResponse** \u2014 full job with embedded songs
-- **Song** \u2014 per-song status and metadata
-- **HealthResponse** \u2014 component health status
+- **SearchResult** — album/playlist/item from search
+- **SearchResponse** — array of search results
+- **DownloadRequest** — id and concurrent fields
+- **JobResponse** — job_id and status
+- **JobStatusResponse** — full job with embedded songs
+- **Song** — per-song status and metadata
+- **HealthResponse** — component health status
