@@ -15,7 +15,7 @@ export default function AuthConflictOverlay({ conflict }: { conflict: boolean })
         </div>
         <h2 className="text-light mb-3">Authentication Configuration Error</h2>
         <p className="mb-4" style={{ color: "#cbd5e1" }}>
-          <span className="text-warning">USE_OIDC</span> and{" "}
+          <span className="text-warning">USE_SOCIAL_LOGIN</span> and{" "}
           <span className="text-warning">USE_SIMPLE_AUTH</span> cannot both be enabled at the same
           time.
         </p>

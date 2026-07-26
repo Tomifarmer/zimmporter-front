@@ -4,8 +4,8 @@ import ApiKeyErrorOverlay from "@/components/ApiKeyErrorOverlay";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import LightfallBackground from "@/components/LightfallBackground";
-import OidcErrorOverlay from "@/components/OidcErrorOverlay";
 import PageContainer from "@/components/PageContainer";
+import SocialLoginErrorOverlay from "@/components/SocialLoginErrorOverlay";
 import AuthProvider from "@/providers/auth-provider";
 
 const appVersion = JSON.parse(fs.readFileSync(join(process.cwd(), "package.json"), "utf8")).version;
@@ -19,18 +19,18 @@ function StickyFooter({ version }: { version: string }) {
 }
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const useOidc = process.env.USE_OIDC === "true";
+  const useSocialLogin = process.env.USE_SOCIAL_LOGIN === "true";
 
   return (
-    <AuthProvider useOidc={useOidc}>
-      <Header useOidc={useOidc} />
+    <AuthProvider useSocialLogin={useSocialLogin}>
+      <Header useSocialLogin={useSocialLogin} />
       <div className="lightfall-bg-wrapper">
         <LightfallBackground />
       </div>
       <PageContainer>{children}</PageContainer>
       <StickyFooter version={appVersion} />
       <ApiKeyErrorOverlay />
-      <OidcErrorOverlay />
+      <SocialLoginErrorOverlay />
     </AuthProvider>
   );
 }

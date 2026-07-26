@@ -2,14 +2,9 @@
 
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
+import type { ProviderInfo } from "./page";
 
-export default function LoginClient({
-  providerName,
-  providerIcon,
-}: {
-  providerName: string;
-  providerIcon: string;
-}) {
+export default function LoginClient({ providers }: { providers: ProviderInfo[] }) {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/search";
 
@@ -25,14 +20,18 @@ export default function LoginClient({
         <p className="mb-4" style={{ color: "#94a3b8" }}>
           Sign in to continue
         </p>
-        <button
-          type="button"
-          className="btn btn-outline-light btn-lg px-4 d-inline-flex align-items-center gap-2"
-          onClick={() => signIn("oidc", { redirectTo: callbackUrl })}
-        >
-          <i className={`pi ${providerIcon}`} />
-          Sign in with {providerName}
-        </button>
+        {providers.map((p) => (
+          <div key={p.id} className="mb-3">
+            <button
+              type="button"
+              className="btn btn-outline-light btn-lg px-4 d-inline-flex align-items-center gap-2 w-100"
+              onClick={() => signIn(p.id, { redirectTo: callbackUrl })}
+            >
+              <i className={`pi ${p.icon}`} />
+              Sign in with {p.name}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );

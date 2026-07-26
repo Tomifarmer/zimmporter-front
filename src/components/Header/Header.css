@@ -41,14 +41,14 @@
 }
 
 .avatar-btn {
-  width: 32px;
-  height: 32px;
-  border: 2px solid transparent !important;
-  border-radius: 50%;
-  transition: border-color 150ms ease;
+  background: none;
+  border: 0;
   padding: 0;
+  border-radius: 50%;
+  transition: box-shadow 150ms ease;
+  line-height: 0;
 }
 
 .avatar-btn:hover {
-  border-color: #0097fb !important;
+  box-shadow: 0 0 5px 1px #0097fb;
 }

@@ -1,24 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api, onOidcError } from "@/lib/api";
+import { api, onSocialLoginError } from "@/lib/api";
 import { getRuntimeConfig } from "@/lib/config";
 
-export default function OidcErrorOverlay() {
+export default function SocialLoginErrorOverlay() {
   const [visible, setVisible] = useState(false);
-  const { useOidc } = getRuntimeConfig();
+  const { useSocialLogin } = getRuntimeConfig();
 
   useEffect(() => {
-    if (useOidc) return;
+    if (useSocialLogin) return;
 
-    onOidcError(() => setVisible(true));
+    onSocialLoginError(() => setVisible(true));
 
     api.get("/jobs?limit=1").catch((err) => {
-      if (err.message?.includes("OIDC") || err.message?.includes("sign in")) {
+      if (err.message?.includes("sign in")) {
         setVisible(true);
       }
     });
-  }, [useOidc]);
+  }, [useSocialLogin]);
 
   if (!visible) return null;
 
@@ -36,13 +36,13 @@ export default function OidcErrorOverlay() {
         </div>
         <h2 className="text-light mb-3">Authentication Required</h2>
         <p className="mb-4" style={{ color: "#cbd5e1" }}>
-          The backend requires OIDC authentication, but no session is active.
+          The backend requires authentication, but no session is active.
         </p>
         <div
           className="text-start p-3 rounded-2 mb-4 font-monospace small"
           style={{ backgroundColor: "#1e293b", color: "#94a3b8" }}
         >
-          Enable <span className="text-warning">USE_OIDC=true</span> and configure your OIDC
+          Enable <span className="text-warning">USE_SOCIAL_LOGIN=true</span> and configure a
           provider to sign in.
         </div>
       </div>

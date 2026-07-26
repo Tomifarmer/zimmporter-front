@@ -24,10 +24,10 @@ function createFetchMock(components?: Record<string, string>, ok = true) {
   });
 }
 
-function renderHeader({ useOidc }: { useOidc?: boolean } = {}) {
+function renderHeader({ useSocialLogin }: { useSocialLogin?: boolean } = {}) {
   return render(
     <SessionProvider>
-      <Header useOidc={useOidc} />
+      <Header useSocialLogin={useSocialLogin} />
     </SessionProvider>,
   );
 }
@@ -38,7 +38,7 @@ describe("Header", () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",
       apiKey: "",
-      useOidc: false,
+      useSocialLogin: false,
       useSimpleAuth: false,
     });
   });
@@ -131,7 +131,7 @@ describe("Header auth section", () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",
       apiKey: "",
-      useOidc: false,
+      useSocialLogin: false,
       useSimpleAuth: false,
     });
     global.fetch = createFetchMock();
@@ -146,12 +146,12 @@ describe("Header auth section", () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",
       apiKey: "",
-      useOidc: true,
+      useSocialLogin: true,
       useSimpleAuth: false,
     });
     global.fetch = createFetchMock();
 
-    renderHeader({ useOidc: true });
+    renderHeader({ useSocialLogin: true });
 
     await waitFor(() => {
       expect(screen.getByText("Login")).toBeInTheDocument();
@@ -162,7 +162,7 @@ describe("Header auth section", () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",
       apiKey: "",
-      useOidc: true,
+      useSocialLogin: true,
       useSimpleAuth: false,
     });
     global.fetch = createFetchMock();
@@ -175,7 +175,7 @@ describe("Header auth section", () => {
           expires: "2099-01-01T00:00:00.000Z",
         }}
       >
-        <Header useOidc />
+        <Header useSocialLogin />
       </SessionProvider>,
     );
 
@@ -191,7 +191,7 @@ describe("Header auth section", () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",
       apiKey: "",
-      useOidc: true,
+      useSocialLogin: true,
       useSimpleAuth: false,
     });
     global.fetch = createFetchMock();
@@ -208,14 +208,14 @@ describe("Header auth section", () => {
           expires: "2099-01-01T00:00:00.000Z",
         }}
       >
-        <Header useOidc />
+        <Header useSocialLogin />
       </SessionProvider>,
     );
 
     await waitFor(() => {
       const img = document.querySelector("img");
       expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute("alt", "");
+      expect(img).toHaveAttribute("alt", "avatar");
     });
   });
 });

@@ -15,13 +15,13 @@ function AccessTokenSync() {
 }
 
 export default function AuthProvider({
-  useOidc,
+  useSocialLogin,
   children,
 }: {
-  useOidc?: boolean;
+  useSocialLogin?: boolean;
   children: React.ReactNode;
 }) {
-  if (!useOidc) {
+  if (!useSocialLogin) {
     return <>{children}</>;
   }
 

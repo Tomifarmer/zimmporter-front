@@ -16,14 +16,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const useOidc = process.env.USE_OIDC === "true";
+  const useSocialLogin = process.env.USE_SOCIAL_LOGIN === "true";
   const useSimpleAuth = process.env.USE_SIMPLE_AUTH === "true";
-  const authConflict = useOidc && useSimpleAuth;
+  const authConflict = useSocialLogin && useSimpleAuth;
 
   const runtimeConfig = {
     apiUrl: process.env.API_URL || "http://localhost:8000",
     apiKey: process.env.API_KEY || "",
-    useOidc,
+    useSocialLogin,
     useSimpleAuth,
   };
 

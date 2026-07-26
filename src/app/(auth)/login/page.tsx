@@ -1,6 +1,12 @@
 import { redirect } from "next/navigation";
 import LoginClient from "./client";
 
+export type ProviderInfo = {
+  id: string;
+  name: string;
+  icon: string;
+};
+
 export default async function LoginPage() {
   const { auth } = await import("@/lib/auth");
   const session = await auth();
@@ -9,14 +15,18 @@ export default async function LoginPage() {
     redirect("/search");
   }
 
-  const issuer = process.env.OIDC_ISSUER_URL || "";
-  const providerInfo = process.env.OIDC_NAME
-    ? { name: process.env.OIDC_NAME, icon: "pi-user" }
-    : issuer.includes("google")
-      ? { name: "Google", icon: "pi-google" }
-      : issuer.includes("github")
-        ? { name: "GitHub", icon: "pi-github" }
-        : { name: "OIDC", icon: "pi-user" };
+  const providers: ProviderInfo[] = [];
 
-  return <LoginClient providerName={providerInfo.name} providerIcon={providerInfo.icon} />;
+  if (process.env.OIDC_ISSUER_URL && process.env.OIDC_CLIENT_ID) {
+    const name = process.env.OIDC_NAME || "";
+    const issuer = process.env.OIDC_ISSUER_URL || "";
+    const displayName = name || (issuer.includes("google") ? "Google" : "OIDC");
+    providers.push({ id: "oidc", name: displayName, icon: "pi-google" });
+  }
+
+  if (process.env.GITHUB_CLIENT_ID) {
+    providers.push({ id: "github", name: "GitHub", icon: "pi-github" });
+  }
+
+  return <LoginClient providers={providers} />;
 }

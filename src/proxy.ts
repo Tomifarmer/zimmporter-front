@@ -6,7 +6,7 @@ export const config = {
 };
 
 export async function proxy(req: NextRequest) {
-  if (process.env.USE_OIDC !== "true") return;
+  if (process.env.USE_SOCIAL_LOGIN !== "true") return;
 
   const session = await auth();
   if (!session?.user) {

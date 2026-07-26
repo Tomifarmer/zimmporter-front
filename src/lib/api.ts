@@ -30,20 +30,20 @@ export function clearApiKeyError() {
   _apiKeyError = false;
 }
 
-let _oidcError = false;
-let _onOidcError: (() => void) | null = null;
+let _socialLoginError = false;
+let _onSocialLoginError: (() => void) | null = null;
 
-export function hasOidcError() {
-  return _oidcError;
+export function hasSocialLoginError() {
+  return _socialLoginError;
 }
 
-export function onOidcError(cb: () => void) {
-  _onOidcError = cb;
-  if (_oidcError) cb();
+export function onSocialLoginError(cb: () => void) {
+  _onSocialLoginError = cb;
+  if (_socialLoginError) cb();
 }
 
-export function clearOidcError() {
-  _oidcError = false;
+export function clearSocialLoginError() {
+  _socialLoginError = false;
 }
 
 api.interceptors.request.use((config) => {
@@ -77,9 +77,13 @@ api.interceptors.response.use(
           );
         }
       }
-      if (msg.includes("OIDC") && !_accessToken && !getRuntimeConfig().useOidc) {
-        _oidcError = true;
-        _onOidcError?.();
+      if (
+        msg.includes("authentication token") &&
+        !_accessToken &&
+        !getRuntimeConfig().useSocialLogin
+      ) {
+        _socialLoginError = true;
+        _onSocialLoginError?.();
         return Promise.reject(new Error("Authentication required. Please sign in."));
       }
     }

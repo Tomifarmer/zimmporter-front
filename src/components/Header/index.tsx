@@ -1,7 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { Avatar } from "primereact/avatar";
 import { useEffect, useState } from "react";
 import { getRuntimeConfig } from "@/lib/config";
 
@@ -29,7 +30,6 @@ function HealthDot({ name, value }: { name: string; value: string }) {
 function AuthSection() {
   const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
-  const [imgFailed, setImgFailed] = useState(false);
 
   if (status === "loading") {
     return (
@@ -40,15 +40,13 @@ function AuthSection() {
   }
 
   if (session?.user) {
-    const avatar = session.user.image;
     const initials = (session.user.name ?? session.user.email ?? "?").charAt(0).toUpperCase();
-    const showImg = !!avatar && !imgFailed;
 
     return (
       <div className="position-relative">
         <button
           type="button"
-          className="avatar-btn overflow-hidden"
+          className="avatar-btn"
           onClick={() => setOpen(!open)}
           onBlur={(e) => {
             if (!e.currentTarget.contains(e.relatedTarget as Node)) {
@@ -56,35 +54,13 @@ function AuthSection() {
             }
           }}
         >
-          {showImg ? (
-            <img
-              src={avatar}
-              alt=""
-              width={28}
-              height={28}
-              onError={() => setImgFailed(true)}
-              style={{
-                objectFit: "cover",
-                cursor: "pointer",
-                borderRadius: "50%",
-                backgroundColor: "#ffffff",
-              }}
-            />
-          ) : (
-            <div
-              className="d-flex align-items-center justify-content-center text-white fw-bold"
-              style={{
-                width: 28,
-                height: 28,
-                fontSize: 14,
-                backgroundColor: "#ffffff",
-                color: "#0f172a",
-                cursor: "pointer",
-              }}
-            >
-              {initials}
-            </div>
-          )}
+          <Avatar
+            image={session.user.image ?? undefined}
+            label={initials}
+            shape="circle"
+            size="normal"
+            style={{ backgroundColor: "#ffffff", color: "#0f172a" }}
+          />
         </button>
         {open && (
           <div
@@ -117,13 +93,13 @@ function AuthSection() {
   }
 
   return (
-    <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => signIn("oidc")}>
+    <a href="/login" className="btn btn-sm btn-outline-primary">
       Login
-    </button>
+    </a>
   );
 }
 
-export default function Header({ useOidc }: { useOidc?: boolean }) {
+export default function Header({ useSocialLogin }: { useSocialLogin?: boolean }) {
   const pathname = usePathname();
   const [healthData, setHealthData] = useState<Record<string, string>>({
     api: "ok",
@@ -172,13 +148,13 @@ export default function Header({ useOidc }: { useOidc?: boolean }) {
           </a>
         ))}
       </div>
-      <div className="d-flex align-items-center gap-2">
-        {useOidc && <AuthSection />}
+      <div className="d-flex align-items-center gap-3">
         {Object.keys(healthData).length > 0
           ? Object.entries(healthData).map(([name, value]) => (
               <HealthDot key={name} name={name} value={value as string} />
             ))
           : null}
+        {useSocialLogin && <AuthSection />}
       </div>
     </nav>
   );

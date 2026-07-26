@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LoginClient from "@/app/(auth)/login/client";
 
-const defaultProps = { providerName: "Google", providerIcon: "pi-google" };
+const defaultProps = { providers: [{ id: "oidc", name: "Google", icon: "pi-google" }] };
 
 const mockedUseSearchParams = vi.fn();
 
@@ -51,5 +51,21 @@ describe("LoginClient", () => {
     await user.click(screen.getByRole("button", { name: /Sign in with Google/ }));
 
     expect(mockSignIn).toHaveBeenCalledWith("oidc", { redirectTo: "/search" });
+  });
+
+  it("renders multiple provider buttons", () => {
+    mockedUseSearchParams.mockReturnValue(new URLSearchParams());
+
+    render(
+      <LoginClient
+        providers={[
+          { id: "oidc", name: "Google", icon: "pi-google" },
+          { id: "github", name: "GitHub", icon: "pi-github" },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Sign in with Google")).toBeInTheDocument();
+    expect(screen.getByText("Sign in with GitHub")).toBeInTheDocument();
   });
 });

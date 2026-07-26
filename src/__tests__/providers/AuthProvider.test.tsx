@@ -15,7 +15,7 @@ afterEach(() => {
 describe("AuthProvider", () => {
   it("renders children without SessionProvider when auth is disabled", () => {
     render(
-      <AuthProvider useOidc={false}>
+      <AuthProvider useSocialLogin={false}>
         <div data-testid="child" />
       </AuthProvider>,
     );
@@ -24,7 +24,7 @@ describe("AuthProvider", () => {
 
   it("renders children inside SessionProvider when auth is enabled", () => {
     render(
-      <AuthProvider useOidc>
+      <AuthProvider useSocialLogin>
         <div data-testid="child" />
       </AuthProvider>,
     );
