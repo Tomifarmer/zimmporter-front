@@ -106,6 +106,9 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
         <div className="col-12 col-sm-6">
           <InfoBox label="Progress" value={data.total_songs > 0 ? `${pct}%` : "\u2014"} />
         </div>
+        <div className="col-12 col-sm-6">
+          <InfoBox label="Requested by" value={data.requested_by || "\u2014"} />
+        </div>
       </div>
 
       {data.total_songs > 0 && !isSuccess && (

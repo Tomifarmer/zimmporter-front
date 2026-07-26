@@ -48,6 +48,7 @@ export interface JobStatusResponse {
   total_songs: number;
   artist?: string;
   album_name?: string;
+  requested_by?: string;
   songs_downloaded: number;
   songs: Song[];
   created_at: string;
