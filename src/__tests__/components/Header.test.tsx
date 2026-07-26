@@ -1,10 +1,16 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import { SessionProvider } from "next-auth/react";
 import Header from "@/components/Header";
+import { getRuntimeConfig } from "@/lib/config";
 
 const mockedUsePathname = vi.fn();
 
 vi.mock("next/navigation", () => ({
   usePathname: () => mockedUsePathname(),
+}));
+
+vi.mock("@/lib/config", () => ({
+  getRuntimeConfig: vi.fn(),
 }));
 
 function createFetchMock(components?: Record<string, string>, ok = true) {
@@ -17,9 +23,22 @@ function createFetchMock(components?: Record<string, string>, ok = true) {
   });
 }
 
+function renderHeader() {
+  return render(
+    <SessionProvider>
+      <Header />
+    </SessionProvider>,
+  );
+}
+
 describe("Header", () => {
   beforeEach(() => {
     mockedUsePathname.mockReturnValue("/search");
+    vi.mocked(getRuntimeConfig).mockReturnValue({
+      apiUrl: "http://localhost:8000",
+      apiKey: "",
+      authEnabled: false,
+    });
   });
 
   afterEach(() => {
@@ -28,34 +47,34 @@ describe("Header", () => {
 
   it("renders the brand name", () => {
     global.fetch = createFetchMock();
-    render(<Header />);
+    renderHeader();
     expect(screen.getByText("Zimmporter")).toBeInTheDocument();
   });
 
   it("renders nav links", () => {
     global.fetch = createFetchMock();
-    render(<Header />);
+    renderHeader();
     expect(screen.getByText("Search")).toBeInTheDocument();
     expect(screen.getByText("Jobs")).toBeInTheDocument();
   });
 
   it("marks the current page nav link as active", () => {
     global.fetch = createFetchMock();
-    render(<Header />);
+    renderHeader();
     const searchLink = screen.getByText("Search").closest("a");
     expect(searchLink?.className).toContain("nav-link-item--active");
   });
 
   it("does not mark inactive nav links as active", () => {
     global.fetch = createFetchMock();
-    render(<Header />);
+    renderHeader();
     const jobsLink = screen.getByText("Jobs").closest("a");
     expect(jobsLink?.className).not.toContain("nav-link-item--active");
   });
 
   it("renders health dots for each component", async () => {
     global.fetch = createFetchMock();
-    render(<Header />);
+    renderHeader();
     await waitFor(() => {
       const dots = document.querySelectorAll(".health-dot");
       expect(dots.length).toBe(4);
@@ -64,7 +83,7 @@ describe("Header", () => {
 
   it("sets all dots to error when health fetch fails", async () => {
     global.fetch = createFetchMock(undefined, false);
-    render(<Header />);
+    renderHeader();
     await waitFor(() => {
       const dots = document.querySelectorAll(".health-dot");
       expect(dots.length).toBe(4);
@@ -74,21 +93,121 @@ describe("Header", () => {
     });
   });
 
-  it("polls health on an interval", async () => {
+  it("polls health on an interval", () => {
     vi.useFakeTimers();
-    const fetchSpy = createFetchMock();
-    global.fetch = fetchSpy;
+    global.fetch = createFetchMock();
 
-    render(<Header />);
+    renderHeader();
 
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const healthCalls = () =>
+      vi
+        .mocked(global.fetch)
+        .mock.calls.filter(([url]) => typeof url === "string" && url.includes("/health")).length;
+
+    expect(healthCalls()).toBe(1);
 
     vi.advanceTimersByTime(1500);
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(healthCalls()).toBe(2);
 
     vi.advanceTimersByTime(1500);
-    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    expect(healthCalls()).toBe(3);
 
     vi.useRealTimers();
+  });
+});
+
+describe("Header auth section", () => {
+  beforeEach(() => {
+    mockedUsePathname.mockReturnValue("/search");
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("does not show auth UI when auth is disabled", () => {
+    vi.mocked(getRuntimeConfig).mockReturnValue({
+      apiUrl: "http://localhost:8000",
+      apiKey: "",
+      authEnabled: false,
+    });
+    global.fetch = createFetchMock();
+
+    renderHeader();
+
+    expect(screen.queryByText("Login")).not.toBeInTheDocument();
+    expect(screen.queryByText("Logout")).not.toBeInTheDocument();
+  });
+
+  it("shows Login button when auth is enabled and no session", async () => {
+    vi.mocked(getRuntimeConfig).mockReturnValue({
+      apiUrl: "http://localhost:8000",
+      apiKey: "",
+      authEnabled: true,
+    });
+    global.fetch = createFetchMock();
+
+    renderHeader();
+
+    await waitFor(() => {
+      expect(screen.getByText("Login")).toBeInTheDocument();
+    });
+  });
+
+  it("shows user info and Logout when auth is enabled and session exists", async () => {
+    vi.mocked(getRuntimeConfig).mockReturnValue({
+      apiUrl: "http://localhost:8000",
+      apiKey: "",
+      authEnabled: true,
+    });
+    global.fetch = createFetchMock();
+
+    render(
+      <SessionProvider
+        session={{
+          user: { name: "Test User", email: "test@example.com" },
+          accessToken: "tok",
+          expires: "2099-01-01T00:00:00.000Z",
+        }}
+      >
+        <Header />
+      </SessionProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Test User")).toBeInTheDocument();
+      expect(screen.getByText("Logout")).toBeInTheDocument();
+    });
+  });
+
+  it("shows user avatar when session has an image", async () => {
+    vi.mocked(getRuntimeConfig).mockReturnValue({
+      apiUrl: "http://localhost:8000",
+      apiKey: "",
+      authEnabled: true,
+    });
+    global.fetch = createFetchMock();
+
+    render(
+      <SessionProvider
+        session={{
+          user: {
+            name: "Test User",
+            email: "test@example.com",
+            image: "https://example.com/avatar.jpg",
+          },
+          accessToken: "tok",
+          expires: "2099-01-01T00:00:00.000Z",
+        }}
+      >
+        <Header />
+      </SessionProvider>,
+    );
+
+    await waitFor(() => {
+      const img = document.querySelector("img");
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute("alt", "");
+    });
   });
 });

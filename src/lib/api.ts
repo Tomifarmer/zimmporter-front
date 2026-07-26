@@ -12,6 +12,19 @@ if (cfg.apiKey) {
   api.defaults.headers.common["X-API-Key"] = cfg.apiKey;
 }
 
+let _accessToken: string | undefined;
+
+export function setAccessToken(token: string | undefined) {
+  _accessToken = token;
+}
+
+api.interceptors.request.use((config) => {
+  if (_accessToken) {
+    config.headers.Authorization = `Bearer ${_accessToken}`;
+  }
+  return config;
+});
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {

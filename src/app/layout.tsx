@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import LightfallBackground from "@/components/LightfallBackground";
 import PageContainer from "@/components/PageContainer";
+import AuthProvider from "@/providers/auth-provider";
 import Providers from "@/providers/query-provider";
 import "./globals.css";
 
@@ -34,6 +35,7 @@ export default function RootLayout({
   const runtimeConfig = {
     apiUrl: process.env.API_URL || "http://localhost:8000",
     apiKey: process.env.API_KEY || "",
+    authEnabled: process.env.AUTH_ENABLED === "true",
   };
 
   return (
@@ -42,13 +44,15 @@ export default function RootLayout({
         <Script id="runtime-config" strategy="beforeInteractive">
           {`window.__RUNTIME_CONFIG__ = ${JSON.stringify(runtimeConfig)};`}
         </Script>
-        <Header />
-        <div className="lightfall-bg-wrapper">
-          <LightfallBackground />
-        </div>
-        <Providers>
-          <PageContainer>{children}</PageContainer>
-        </Providers>
+        <AuthProvider>
+          <Header />
+          <div className="lightfall-bg-wrapper">
+            <LightfallBackground />
+          </div>
+          <Providers>
+            <PageContainer>{children}</PageContainer>
+          </Providers>
+        </AuthProvider>
         <StickyFooter version={appVersion} />
       </body>
     </html>

@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { getRuntimeConfig } from "@/lib/config";
 
@@ -25,8 +27,52 @@ function HealthDot({ name, value }: { name: string; value: string }) {
   );
 }
 
+function AuthSection() {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return (
+      <div className="d-flex align-items-center gap-2">
+        <span className="text-muted small">...</span>
+      </div>
+    );
+  }
+
+  if (session?.user) {
+    return (
+      <div className="d-flex align-items-center gap-2">
+        {session.user.image && (
+          <Image
+            src={session.user.image}
+            alt=""
+            width={28}
+            height={28}
+            className="rounded-circle"
+            style={{ objectFit: "cover" }}
+          />
+        )}
+        <span className="small text-light">{session.user.name ?? session.user.email}</span>
+        <button
+          type="button"
+          className="btn btn-sm btn-outline-secondary"
+          onClick={() => signOut()}
+        >
+          Logout
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => signIn("oidc")}>
+      Login
+    </button>
+  );
+}
+
 export default function Header() {
   const pathname = usePathname();
+  const { authEnabled } = getRuntimeConfig();
   const [healthData, setHealthData] = useState<Record<string, string>>({
     api: "ok",
     redis: "ok",
@@ -75,6 +121,7 @@ export default function Header() {
         ))}
       </div>
       <div className="d-flex align-items-center gap-2">
+        {authEnabled && <AuthSection />}
         {Object.keys(healthData).length > 0
           ? Object.entries(healthData).map(([name, value]) => (
               <HealthDot key={name} name={name} value={value as string} />
