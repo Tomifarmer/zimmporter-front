@@ -43,9 +43,14 @@ export default function ApiKeyErrorOverlay() {
           style={{ backgroundColor: "#1e293b", color: "#94a3b8" }}
         >
           {useSimpleAuth ? (
-            <>Set <span className="text-warning">API_KEY</span> in your environment variables.</>
+            <>
+              Set <span className="text-warning">API_KEY</span> in your environment variables.
+            </>
           ) : (
-            <>Set <span className="text-warning">USE_SIMPLE_AUTH=true</span> and configure <span className="text-warning">API_KEY</span>.</>
+            <>
+              Set <span className="text-warning">USE_SIMPLE_AUTH=true</span> and configure{" "}
+              <span className="text-warning">API_KEY</span>.
+            </>
           )}
         </div>
       </div>

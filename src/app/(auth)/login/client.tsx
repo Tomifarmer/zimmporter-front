@@ -3,7 +3,13 @@
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
-export default function LoginClient({ providerName, providerIcon }: { providerName: string; providerIcon: string }) {
+export default function LoginClient({
+  providerName,
+  providerIcon,
+}: {
+  providerName: string;
+  providerIcon: string;
+}) {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/search";
 
@@ -16,7 +22,9 @@ export default function LoginClient({ providerName, providerIcon }: { providerNa
         <h1 className="display-4 fw-bold mb-1" style={{ color: "#0097fb" }}>
           Zimmporter
         </h1>
-        <p className="mb-4" style={{ color: "#94a3b8" }}>Sign in to continue</p>
+        <p className="mb-4" style={{ color: "#94a3b8" }}>
+          Sign in to continue
+        </p>
         <button
           type="button"
           className="btn btn-outline-light btn-lg px-4 d-inline-flex align-items-center gap-2"

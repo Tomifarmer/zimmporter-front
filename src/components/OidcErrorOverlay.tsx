@@ -42,7 +42,8 @@ export default function OidcErrorOverlay() {
           className="text-start p-3 rounded-2 mb-4 font-monospace small"
           style={{ backgroundColor: "#1e293b", color: "#94a3b8" }}
         >
-          Enable <span className="text-warning">USE_OIDC=true</span> and configure your OIDC provider to sign in.
+          Enable <span className="text-warning">USE_OIDC=true</span> and configure your OIDC
+          provider to sign in.
         </div>
       </div>
     </div>

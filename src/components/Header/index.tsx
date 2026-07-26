@@ -63,12 +63,24 @@ function AuthSection() {
               width={28}
               height={28}
               onError={() => setImgFailed(true)}
-              style={{ objectFit: "cover", cursor: "pointer", borderRadius: "50%", backgroundColor: "#ffffff" }}
+              style={{
+                objectFit: "cover",
+                cursor: "pointer",
+                borderRadius: "50%",
+                backgroundColor: "#ffffff",
+              }}
             />
           ) : (
             <div
               className="d-flex align-items-center justify-content-center text-white fw-bold"
-              style={{ width: 28, height: 28, fontSize: 14, backgroundColor: "#ffffff", color: "#0f172a", cursor: "pointer" }}
+              style={{
+                width: 28,
+                height: 28,
+                fontSize: 14,
+                backgroundColor: "#ffffff",
+                color: "#0f172a",
+                cursor: "pointer",
+              }}
             >
               {initials}
             </div>
@@ -79,7 +91,10 @@ function AuthSection() {
             className="position-absolute end-0 mt-2 rounded-2 shadow-lg"
             style={{ backgroundColor: "#1e293b", minWidth: 180, zIndex: 100 }}
           >
-            <div className="px-3 py-2 text-light small border-bottom" style={{ borderColor: "#334155" }}>
+            <div
+              className="px-3 py-2 text-light small border-bottom"
+              style={{ borderColor: "#334155" }}
+            >
               {session.user.name ?? session.user.email}
             </div>
             <button

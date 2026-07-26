@@ -15,13 +15,16 @@ export default function AuthConflictOverlay({ conflict }: { conflict: boolean })
         </div>
         <h2 className="text-light mb-3">Authentication Configuration Error</h2>
         <p className="mb-4" style={{ color: "#cbd5e1" }}>
-          <span className="text-warning">USE_OIDC</span> and <span className="text-warning">USE_SIMPLE_AUTH</span> cannot both be enabled at the same time.
+          <span className="text-warning">USE_OIDC</span> and{" "}
+          <span className="text-warning">USE_SIMPLE_AUTH</span> cannot both be enabled at the same
+          time.
         </p>
         <div
           className="text-start p-3 rounded-2 mb-4 font-monospace small"
           style={{ backgroundColor: "#1e293b", color: "#94a3b8" }}
         >
-          Set only one to <span className="text-warning">true</span> or set both to <span className="text-warning">false</span>.
+          Set only one to <span className="text-warning">true</span> or set both to{" "}
+          <span className="text-warning">false</span>.
         </div>
       </div>
     </div>

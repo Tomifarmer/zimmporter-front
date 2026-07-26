@@ -1,10 +1,10 @@
 import * as fs from "node:fs";
 import { join } from "node:path";
 import ApiKeyErrorOverlay from "@/components/ApiKeyErrorOverlay";
-import OidcErrorOverlay from "@/components/OidcErrorOverlay";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import LightfallBackground from "@/components/LightfallBackground";
+import OidcErrorOverlay from "@/components/OidcErrorOverlay";
 import PageContainer from "@/components/PageContainer";
 import AuthProvider from "@/providers/auth-provider";
 
@@ -23,14 +23,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthProvider useOidc={useOidc}>
-        <Header useOidc={useOidc} />
-        <div className="lightfall-bg-wrapper">
-          <LightfallBackground />
-        </div>
-        <PageContainer>{children}</PageContainer>
-        <StickyFooter version={appVersion} />
-        <ApiKeyErrorOverlay />
-        <OidcErrorOverlay />
-      </AuthProvider>
+      <Header useOidc={useOidc} />
+      <div className="lightfall-bg-wrapper">
+        <LightfallBackground />
+      </div>
+      <PageContainer>{children}</PageContainer>
+      <StickyFooter version={appVersion} />
+      <ApiKeyErrorOverlay />
+      <OidcErrorOverlay />
+    </AuthProvider>
   );
 }
