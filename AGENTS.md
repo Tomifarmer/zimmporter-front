@@ -23,20 +23,40 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 - **Dynamic imports** (e.g., `next/dynamic` for PrimeReact Dropdown) are mocked in page test files as needed
 
 ## Project Structure
+- `src/proxy.ts` — Next.js 16 proxy; redirects unauthenticated users to `/login` when `USE_OIDC=true`
 - `src/app/api/config/route.ts` — runtime config endpoint (reads `API_URL` and `API_KEY` from server env)
-- `src/app/` — App Router pages (`page.tsx`, `/jobs`, `/search`)
-- `src/components/` — shared UI components
-- `src/lib/api.ts` — single axios client; all API calls go through here
+- `src/app/` — App Router pages (`(app)/page.tsx`, `(app)/search/`, `(app)/jobs/`, `(auth)/login/`)
+- `src/components/ApiKeyErrorOverlay.tsx` — full-page overlay when backend requires API key but none configured
+- `src/components/OidcErrorOverlay.tsx` — full-page overlay when backend requires OIDC but no session active
+- `src/components/AuthConflictOverlay.tsx` — full-page overlay when both `USE_OIDC` and `USE_SIMPLE_AUTH` are enabled
+- `src/lib/api.ts` — single axios client; auth interceptors for `X-API-Key` and Bearer token
+- `src/lib/auth.ts` — NextAuth v5 config; OIDC provider, JWT/session image passthrough
+- `src/lib/config.ts` — `RuntimeConfig` type with `useOidc`, `useSimpleAuth`, `apiUrl`, `apiKey`
 - `src/hooks/useJobPolling.ts` — polls job status every 3s while pending/running
+- `src/providers/auth-provider.tsx` — wraps children in `SessionProvider` when `USE_OIDC=true`
 - `src/providers/query-provider.tsx` — React Query wrapper (all pages are inside it)
 - `src/types/api.ts` — shared TypeScript types for API responses
 
 Path alias: `@/*` maps to `src/*`.
 
 ## Environment Variables
-Set in `.env.local` or docker-compose:
-- `API_URL` — backend address (default `http://localhost:8000`, read at runtime via `GET /api/config`)
-- `API_KEY` — optional API key sent as `X-API-Key` header (read at runtime via `GET /api/config`)
+Set in `.env.local` or container environment at runtime.
+
+| Variable | Default | Description |
+|---|---|---|
+| `API_URL` | `http://localhost:8000` | Backend API base URL (read at runtime via `GET /api/config`) |
+| `API_KEY` | `""` | API key sent as `X-API-Key` header when `USE_SIMPLE_AUTH=true` |
+| `USE_OIDC` | `false` | Enable OIDC sign-in via NextAuth; proxy redirects to `/login` |
+| `USE_SIMPLE_AUTH` | `false` | Enable API key auth; sends `X-API-Key` header to backend |
+| `OIDC_NAME` | `"OIDC"` | Display name for the OIDC provider on the login button |
+| `OIDC_ISSUER_URL` | `""` | OIDC issuer URL (e.g. `https://accounts.google.com`) |
+| `OIDC_CLIENT_ID` | `""` | OIDC client ID |
+| `OIDC_CLIENT_SECRET` | `""` | OIDC client secret |
+| `AUTH_SECRET` | `"dev-secret-change-in-production"` | NextAuth encryption secret (generate with `openssl rand -base64 32`) |
+
+`USE_OIDC` and `USE_SIMPLE_AUTH` cannot both be `true`; the app shows an error overlay if both are enabled.
+
+Backend sibling repo: `../zimmporter-api`.
 
 Backend sibling repo: `../zimmporter-api`.
 

@@ -18,7 +18,7 @@ Web interface for the Zimmporter music import API. Built with Next.js 15, TypeSc
 
 ```bash
 cp .env.example .env.local
-# Edit .env.local with your API_KEY if auth is enabled
+# Edit .env.local to configure auth (USE_OIDC, USE_SIMPLE_AUTH, API_KEY, etc.)
 npm install
 npm run dev    # http://localhost:3000
 npm run build  # production build
@@ -30,7 +30,16 @@ npm run lint   # biome check (lint + format + imports)
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `API_URL` | No | `http://localhost:8000` | Backend API base URL (read at runtime via `/api/config`) |
-| `API_KEY` | No | `""` | API key (passed as `X-API-Key` header, read at runtime via `/api/config`) |
+| `API_KEY` | No | `""` | API key sent as `X-API-Key` header when `USE_SIMPLE_AUTH=true` |
+| `USE_OIDC` | No | `false` | Enable OIDC sign-in via NextAuth; proxy redirects to `/login` |
+| `USE_SIMPLE_AUTH` | No | `false` | Enable API key auth; sends `X-API-Key` header to backend |
+| `OIDC_NAME` | No | `"OIDC"` | Display name for the OIDC provider on the login button |
+| `OIDC_ISSUER_URL` | No | `""` | OIDC issuer URL (e.g. `https://accounts.google.com`) |
+| `OIDC_CLIENT_ID` | No | `""` | OIDC client ID |
+| `OIDC_CLIENT_SECRET` | No | `""` | OIDC client secret |
+| `AUTH_SECRET` | No | `"dev-secret-change-in-production"` | NextAuth encryption secret (generate with `openssl rand -base64 32`) |
+
+`USE_OIDC` and `USE_SIMPLE_AUTH` cannot both be `true`; the app shows an error overlay if both are enabled.
 
 Set in `.env.local` for local development, or via container environment at runtime.
 
@@ -108,7 +117,9 @@ src/
 ### API Client (`src/lib/api.ts`)
 
 - Axios instance fetches runtime config from `/api/config` (reads `API_URL` / `API_KEY` from server env)
-- Response interceptor normalizes error messages
+- Request interceptor adds `X-API-Key` header when `USE_SIMPLE_AUTH=true` and `API_KEY` is set
+- Request interceptor adds `Authorization: Bearer` header when an OIDC access token is available
+- Response interceptor detects 401 errors and triggers full-page overlays for missing API key or OIDC session
 
 ### Job Polling (`src/hooks/useJobPolling.ts`)
 

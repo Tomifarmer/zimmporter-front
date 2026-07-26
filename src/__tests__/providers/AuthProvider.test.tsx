@@ -1,10 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { getRuntimeConfig } from "@/lib/config";
 import AuthProvider from "@/providers/auth-provider";
-
-vi.mock("@/lib/config", () => ({
-  getRuntimeConfig: vi.fn(),
-}));
 
 beforeEach(() => {
   global.fetch = vi.fn().mockResolvedValue({
@@ -19,14 +14,8 @@ afterEach(() => {
 
 describe("AuthProvider", () => {
   it("renders children without SessionProvider when auth is disabled", () => {
-    vi.mocked(getRuntimeConfig).mockReturnValue({
-      apiUrl: "http://localhost:8000",
-      apiKey: "",
-      authEnabled: false,
-    });
-
     render(
-      <AuthProvider>
+      <AuthProvider useOidc={false}>
         <div data-testid="child" />
       </AuthProvider>,
     );
@@ -34,14 +23,8 @@ describe("AuthProvider", () => {
   });
 
   it("renders children inside SessionProvider when auth is enabled", () => {
-    vi.mocked(getRuntimeConfig).mockReturnValue({
-      apiUrl: "http://localhost:8000",
-      apiKey: "",
-      authEnabled: true,
-    });
-
     render(
-      <AuthProvider>
+      <AuthProvider useOidc>
         <div data-testid="child" />
       </AuthProvider>,
     );

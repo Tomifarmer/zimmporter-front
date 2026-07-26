@@ -132,6 +132,11 @@
   color: #475569;
 }
 
+.job-row-meta-user {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
 .job-row-running-indicator {
   color: #40e0d0;
   font-size: 0.6875rem;

@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { SessionProvider } from "next-auth/react";
 import Header from "@/components/Header";
 import { getRuntimeConfig } from "@/lib/config";
@@ -23,10 +24,10 @@ function createFetchMock(components?: Record<string, string>, ok = true) {
   });
 }
 
-function renderHeader() {
+function renderHeader({ useOidc }: { useOidc?: boolean } = {}) {
   return render(
     <SessionProvider>
-      <Header />
+      <Header useOidc={useOidc} />
     </SessionProvider>,
   );
 }
@@ -37,7 +38,8 @@ describe("Header", () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",
       apiKey: "",
-      authEnabled: false,
+      useOidc: false,
+      useSimpleAuth: false,
     });
   });
 
@@ -129,7 +131,8 @@ describe("Header auth section", () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",
       apiKey: "",
-      authEnabled: false,
+      useOidc: false,
+      useSimpleAuth: false,
     });
     global.fetch = createFetchMock();
 
@@ -143,11 +146,12 @@ describe("Header auth section", () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",
       apiKey: "",
-      authEnabled: true,
+      useOidc: true,
+      useSimpleAuth: false,
     });
     global.fetch = createFetchMock();
 
-    renderHeader();
+    renderHeader({ useOidc: true });
 
     await waitFor(() => {
       expect(screen.getByText("Login")).toBeInTheDocument();
@@ -158,7 +162,8 @@ describe("Header auth section", () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",
       apiKey: "",
-      authEnabled: true,
+      useOidc: true,
+      useSimpleAuth: false,
     });
     global.fetch = createFetchMock();
 
@@ -170,21 +175,24 @@ describe("Header auth section", () => {
           expires: "2099-01-01T00:00:00.000Z",
         }}
       >
-        <Header />
+        <Header useOidc />
       </SessionProvider>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByText("Test User")).toBeInTheDocument();
-      expect(screen.getByText("Logout")).toBeInTheDocument();
-    });
+    const user = userEvent.setup();
+    const avatar = screen.getByText("T");
+    await user.click(avatar);
+
+    expect(screen.getByText("Test User")).toBeInTheDocument();
+    expect(screen.getByText("Logout")).toBeInTheDocument();
   });
 
   it("shows user avatar when session has an image", async () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",
       apiKey: "",
-      authEnabled: true,
+      useOidc: true,
+      useSimpleAuth: false,
     });
     global.fetch = createFetchMock();
 
@@ -200,7 +208,7 @@ describe("Header auth section", () => {
           expires: "2099-01-01T00:00:00.000Z",
         }}
       >
-        <Header />
+        <Header useOidc />
       </SessionProvider>,
     );
 

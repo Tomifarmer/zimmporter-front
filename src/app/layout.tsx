@@ -1,12 +1,6 @@
-import * as fs from "node:fs";
-import { join } from "node:path";
 import type { Metadata } from "next";
 import Script from "next/script";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import LightfallBackground from "@/components/LightfallBackground";
-import PageContainer from "@/components/PageContainer";
-import AuthProvider from "@/providers/auth-provider";
+import AuthConflictOverlay from "@/components/AuthConflictOverlay";
 import Providers from "@/providers/query-provider";
 import "./globals.css";
 
@@ -17,25 +11,20 @@ export const metadata: Metadata = {
   description: "Music Importer Dashboard",
 };
 
-const appVersion = JSON.parse(fs.readFileSync(join(process.cwd(), "package.json"), "utf8")).version;
-
-function StickyFooter({ version }: { version: string }) {
-  return (
-    <div className="sticky-footer-wrapper">
-      <Footer version={version} />
-    </div>
-  );
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const useOidc = process.env.USE_OIDC === "true";
+  const useSimpleAuth = process.env.USE_SIMPLE_AUTH === "true";
+  const authConflict = useOidc && useSimpleAuth;
+
   const runtimeConfig = {
     apiUrl: process.env.API_URL || "http://localhost:8000",
     apiKey: process.env.API_KEY || "",
-    authEnabled: process.env.AUTH_ENABLED === "true",
+    useOidc,
+    useSimpleAuth,
   };
 
   return (
@@ -44,16 +33,8 @@ export default function RootLayout({
         <Script id="runtime-config" strategy="beforeInteractive">
           {`window.__RUNTIME_CONFIG__ = ${JSON.stringify(runtimeConfig)};`}
         </Script>
-        <AuthProvider>
-          <Header />
-          <div className="lightfall-bg-wrapper">
-            <LightfallBackground />
-          </div>
-          <Providers>
-            <PageContainer>{children}</PageContainer>
-          </Providers>
-        </AuthProvider>
-        <StickyFooter version={appVersion} />
+        <Providers>{children}</Providers>
+        <AuthConflictOverlay conflict={authConflict} />
       </body>
     </html>
   );

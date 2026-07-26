@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -29,6 +28,8 @@ function HealthDot({ name, value }: { name: string; value: string }) {
 
 function AuthSection() {
   const { data: session, status } = useSession();
+  const [open, setOpen] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
 
   if (status === "loading") {
     return (
@@ -39,26 +40,63 @@ function AuthSection() {
   }
 
   if (session?.user) {
+    const avatar = session.user.image;
+    const initials = (session.user.name ?? session.user.email ?? "?").charAt(0).toUpperCase();
+    const showImg = !!avatar && !imgFailed;
+
     return (
-      <div className="d-flex align-items-center gap-2">
-        {session.user.image && (
-          <Image
-            src={session.user.image}
-            alt=""
-            width={28}
-            height={28}
-            className="rounded-circle"
-            style={{ objectFit: "cover" }}
-          />
-        )}
-        <span className="small text-light">{session.user.name ?? session.user.email}</span>
+      <div className="position-relative">
         <button
           type="button"
-          className="btn btn-sm btn-outline-secondary"
-          onClick={() => signOut()}
+          className="avatar-btn overflow-hidden"
+          onClick={() => setOpen(!open)}
+          onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+              setOpen(false);
+            }
+          }}
         >
-          Logout
+          {showImg ? (
+            <img
+              src={avatar}
+              alt=""
+              width={28}
+              height={28}
+              onError={() => setImgFailed(true)}
+              style={{ objectFit: "cover", cursor: "pointer", borderRadius: "50%", backgroundColor: "#ffffff" }}
+            />
+          ) : (
+            <div
+              className="d-flex align-items-center justify-content-center text-white fw-bold"
+              style={{ width: 28, height: 28, fontSize: 14, backgroundColor: "#ffffff", color: "#0f172a", cursor: "pointer" }}
+            >
+              {initials}
+            </div>
+          )}
         </button>
+        {open && (
+          <div
+            className="position-absolute end-0 mt-2 rounded-2 shadow-lg"
+            style={{ backgroundColor: "#1e293b", minWidth: 180, zIndex: 100 }}
+          >
+            <div className="px-3 py-2 text-light small border-bottom" style={{ borderColor: "#334155" }}>
+              {session.user.name ?? session.user.email}
+            </div>
+            <button
+              type="button"
+              className="btn btn-sm w-100 text-start rounded-0 px-3 py-2 text-light"
+              style={{ backgroundColor: "transparent" }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                signOut();
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#334155")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -70,9 +108,8 @@ function AuthSection() {
   );
 }
 
-export default function Header() {
+export default function Header({ useOidc }: { useOidc?: boolean }) {
   const pathname = usePathname();
-  const { authEnabled } = getRuntimeConfig();
   const [healthData, setHealthData] = useState<Record<string, string>>({
     api: "ok",
     redis: "ok",
@@ -121,7 +158,7 @@ export default function Header() {
         ))}
       </div>
       <div className="d-flex align-items-center gap-2">
-        {authEnabled && <AuthSection />}
+        {useOidc && <AuthSection />}
         {Object.keys(healthData).length > 0
           ? Object.entries(healthData).map(([name, value]) => (
               <HealthDot key={name} name={name} value={value as string} />

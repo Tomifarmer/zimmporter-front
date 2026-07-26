@@ -14,7 +14,7 @@ function createWrapper() {
 }
 
 async function importJobsPage() {
-  const mod = await import("@/app/jobs/page");
+  const mod = await import("@/app/(app)/jobs/page");
   return mod.default;
 }
 
