@@ -29,7 +29,7 @@ function createWrapper() {
 }
 
 async function importSearchPage() {
-  const mod = await import("@/app/search/page");
+  const mod = await import("@/app/(app)/search/page");
   return mod.default;
 }
 

@@ -10,9 +10,9 @@
 @import "@/components/JobRow/JobRow.css";
 @import "@/components/Lightfall/Lightfall.css";
 @import "@/app/not-found.css";
-@import "@/app/jobs/JobsPage.css";
-@import "@/app/jobs/[id]/JobDetailPage.css";
-@import "@/app/search/SearchPage.css";
+@import "@/app/(app)/jobs/JobsPage.css";
+@import "@/app/(app)/jobs/[id]/JobDetailPage.css";
+@import "@/app/(app)/search/SearchPage.css";
 
 * {
   margin: 0;

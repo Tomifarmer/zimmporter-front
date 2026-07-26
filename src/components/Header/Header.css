@@ -39,3 +39,16 @@
 .nav-link-item--active {
   border-bottom-color: #ffffff;
 }
+
+.avatar-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  border-radius: 50%;
+  transition: box-shadow 150ms ease;
+  line-height: 0;
+}
+
+.avatar-btn:hover {
+  box-shadow: 0 0 5px 1px #0097fb;
+}

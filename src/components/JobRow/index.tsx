@@ -91,6 +91,7 @@ export default function JobRow({ job }: { job: JobStatusResponse }) {
             {job.updated_at && job.created_at !== job.updated_at && (
               <span className="job-row-meta-updated">Updated {relativeTime(job.updated_at)}</span>
             )}
+            {job.requested_by && <span className="job-row-meta-user">by {job.requested_by}</span>}
           </div>
           {isRunning && (
             <span className="job-row-running-indicator">

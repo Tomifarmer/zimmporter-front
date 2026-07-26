@@ -38,7 +38,17 @@
       }
     },
     {
-      "includes": ["src/app/search/page.tsx"],
+      "includes": ["src/app/(app)/search/page.tsx"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noImgElement": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/components/Header/index.tsx"],
       "linter": {
         "rules": {
           "performance": {

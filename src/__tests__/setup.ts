@@ -1,6 +1,8 @@
 import "@testing-library/jest-dom/vitest";
 import { mockApi } from "./helpers/api-mock";
 
+const mockSetAccessToken = vi.fn();
+
 vi.mock("@/lib/api", () => ({
   api: {
     get: mockApi.get,
@@ -13,5 +15,6 @@ vi.mock("@/lib/api", () => ({
       response: { use: vi.fn(), eject: vi.fn(), clear: vi.fn() },
     },
   },
+  setAccessToken: mockSetAccessToken,
   default: null,
 }));
