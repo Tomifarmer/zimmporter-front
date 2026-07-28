@@ -20,8 +20,14 @@ export default function RootLayout({
   const useSimpleAuth = process.env.USE_SIMPLE_AUTH === "true";
   const authConflict = useSocialLogin && useSimpleAuth;
 
+  const rawApiUrl = process.env.API_URL;
+  if (rawApiUrl && !/^https?:\/\//.test(rawApiUrl)) {
+    console.error(`Error: API_URL must start with http:// or https://, got: "${rawApiUrl}"`);
+    process.exit(1);
+  }
+
   const runtimeConfig = {
-    apiUrl: process.env.API_URL || "http://localhost:8000",
+    apiUrl: rawApiUrl || "http://localhost:8000",
     apiKey: process.env.API_KEY || "",
     useSocialLogin,
     useSimpleAuth,
