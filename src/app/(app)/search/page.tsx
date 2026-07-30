@@ -15,7 +15,7 @@ const Dropdown = dynamic(
   { ssr: false },
 );
 
-type SearchType = "albums" | "playlists";
+type SearchType = "albums" | "featured_playlists" | "community_playlists";
 
 const LIMIT_DEFAULT = 10;
 const LIMIT_MAX = 50;
@@ -81,8 +81,14 @@ export default function SearchPage() {
     <div className="space-y-6">
       <div className="search-bar-row">
         <Badge
-          value={searchType === "albums" ? "A" : "P"}
-          title={searchType === "albums" ? "Album selected" : "Playlist selected"}
+          value={searchType === "albums" ? "A" : searchType === "featured_playlists" ? "F" : "C"}
+          title={
+            searchType === "albums"
+              ? "Album selected"
+              : searchType === "featured_playlists"
+                ? "Featured Playlists selected"
+                : "Community Playlists selected"
+          }
           className="search-type-badge"
         />
         <div className="search-input-wrapper">
@@ -104,7 +110,8 @@ export default function SearchPage() {
             value={searchType}
             options={[
               { label: "Albums", value: "albums" },
-              { label: "Playlists", value: "playlists" },
+              { label: "Featured Playlists", value: "featured_playlists" },
+              { label: "Community Playlists", value: "community_playlists" },
             ]}
             onChange={(e: DropdownChangeEvent) => setSearchType(e.value as SearchType)}
             dropdownIcon="pi pi-chevron-down"

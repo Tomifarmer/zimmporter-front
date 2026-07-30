@@ -52,7 +52,7 @@ Set in `.env.local` for local development, or via container environment at runti
 | Route | Description |
 |-------|-------------|
 | `/` | Dashboard — system health cards, job stats, recent jobs |
-| `/search` | Search YouTube Music for albums/playlists, multi-select, batch download |
+| `/search` | Search YouTube Music for albums, featured playlists, or community playlists — multi-select, batch download |
 | `/jobs` | Paginated jobs list with progress bars |
 | `/jobs/[id]` | Job detail — live polling (3s), songs table |
 
@@ -66,7 +66,7 @@ Set in `.env.local` for local development, or via container environment at runti
 ### Search (`/search`)
 
 - Search input (Enter to submit)
-- Albums / Playlists toggle
+- Albums / Featured Playlists / Community Playlists type selector
 - Multi-select results with checkboxes
 - Concurrent downloads slider (1–32, default 4)
 - Select All toggle button
