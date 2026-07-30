@@ -6,7 +6,7 @@ import { Badge } from "primereact/badge";
 import { Card } from "primereact/card";
 import type { DropdownChangeEvent } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import type { SearchResponse, SearchResult } from "@/types/api";
 
@@ -28,6 +28,7 @@ export default function SearchPage() {
   const [limit, setLimit] = useState(LIMIT_DEFAULT);
   const [concurrent, setConcurrent] = useState(4);
   const [showSettings, setShowSettings] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   const searchResult = useQuery<SearchResponse>({
@@ -75,6 +76,41 @@ export default function SearchPage() {
     });
   };
 
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key.length > 1 && e.key !== "Backspace" && e.key !== "Enter") return;
+
+      const input = inputRef.current;
+      if (!input) return;
+
+      e.preventDefault();
+      input.focus();
+
+      if (e.key === "Backspace") {
+        setQuery((prev) => prev.slice(0, -1));
+      } else if (e.key.length === 1) {
+        setQuery((prev) => prev + e.key);
+      }
+    };
+
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
+
   const { results } = searchResult.data || { results: [] };
 
   return (
@@ -93,6 +129,7 @@ export default function SearchPage() {
         />
         <div className="search-input-wrapper">
           <InputText
+            ref={inputRef}
             className="search-text-input"
             value={query}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
