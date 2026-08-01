@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Verify that when package.json's version changes, a matching vX.Y.Z tag exists.
+# Mirrors the CI check in .github/workflows/build.yml.
+
+root="$(git rev-parse --show-toplevel)"
+
+if [[ ! -f "$root/package.json" ]]; then
+  exit 0
+fi
+
+prev_version="$(git show HEAD:package.json 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{process.stdout.write(JSON.parse(s).version)}catch{}})")"
+new_version="$(node -e "process.stdout.write(require('$root/package.json').version)")"
+
+if [[ "$prev_version" == "$new_version" ]]; then
+  exit 0
+fi
+
+if git tag -l "v$new_version" | grep -q .; then
+  exit 0
+fi
+
+echo "error: package.json version changed to $new_version but no tag v$new_version exists."
+echo "Create the tag first: git tag v$new_version"
+exit 1
