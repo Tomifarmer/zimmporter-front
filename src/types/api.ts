@@ -61,4 +61,5 @@ export interface CookieStatus {
   cookie_count: number;
   domains: string[];
   modified_at: string | null;
+  is_stale: boolean;
 }

@@ -55,8 +55,12 @@ export default function CookieManager() {
       <div className="cookie-manager-title-row">
         <span className="cookie-manager-title">YouTube cookies</span>
         {!isLoading && data && (
-          <span className={`cookie-status-badge${data.exists ? " cookie-status-badge--ok" : ""}`}>
-            {data.exists ? "Configured" : "Not configured"}
+          <span
+            className={`cookie-status-badge${
+              data.exists && !data.is_stale ? " cookie-status-badge--ok" : ""
+            }${data.exists && data.is_stale ? " cookie-status-badge--stale" : ""}`}
+          >
+            {data.exists ? (data.is_stale ? "Stale" : "Configured") : "Not configured"}
           </span>
         )}
       </div>
@@ -92,6 +96,12 @@ export default function CookieManager() {
             <p className="cookie-manager-empty">
               No cookies configured. Export your YouTube cookies in Netscape format (e.g. with a
               browser extension) and upload them here to authenticate age-restricted downloads.
+            </p>
+          )}
+          {data.exists && data.is_stale && (
+            <p className="cookie-manager-stale-note">
+              These cookies are stale or invalid — YouTube is rejecting them, so downloads run
+              without them. Export fresh cookies from your browser and upload them below.
             </p>
           )}
         </div>

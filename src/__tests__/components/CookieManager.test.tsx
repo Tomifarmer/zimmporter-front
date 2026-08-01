@@ -20,6 +20,7 @@ const CONFIGURED: CookieStatus = {
   cookie_count: 42,
   domains: [".youtube.com", ".google.com"],
   modified_at: "2026-08-01T12:00:00Z",
+  is_stale: false,
 };
 
 const NOT_CONFIGURED: CookieStatus = {
@@ -28,6 +29,7 @@ const NOT_CONFIGURED: CookieStatus = {
   cookie_count: 0,
   domains: [],
   modified_at: null,
+  is_stale: false,
 };
 
 describe("CookieManager", () => {
@@ -50,6 +52,14 @@ describe("CookieManager", () => {
 
     await waitFor(() => expect(screen.getByText("Not configured")).toBeInTheDocument());
     expect(screen.getByText(/No cookies configured/)).toBeInTheDocument();
+  });
+
+  it("shows stale badge and note when cookies are stale", async () => {
+    mockApiGet({ ...CONFIGURED, is_stale: true });
+    render(<CookieManager />, { wrapper: createWrapper() });
+
+    await waitFor(() => expect(screen.getByText("Stale")).toBeInTheDocument());
+    expect(screen.getByText(/stale or invalid/)).toBeInTheDocument();
   });
 
   it("uploads a selected file", async () => {

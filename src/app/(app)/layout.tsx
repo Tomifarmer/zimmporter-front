@@ -1,6 +1,7 @@
 import * as fs from "node:fs";
 import { join } from "node:path";
 import ApiKeyErrorOverlay from "@/components/ApiKeyErrorOverlay";
+import CookieStaleBanner from "@/components/CookieStaleBanner";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import LightfallBackground from "@/components/LightfallBackground";
@@ -27,6 +28,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="lightfall-bg-wrapper">
         <LightfallBackground />
       </div>
+      <CookieStaleBanner />
       <PageContainer>{children}</PageContainer>
       <StickyFooter version={appVersion} />
       <ApiKeyErrorOverlay />

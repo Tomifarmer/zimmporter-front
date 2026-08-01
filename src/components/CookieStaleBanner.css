@@ -1,0 +1,52 @@
+/* ── Cookie stale banner ── */
+.cookie-stale-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background-color: rgba(245, 158, 11, 0.12);
+  border: 1px solid #b45309;
+  color: #fbbf24;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cookie-stale-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.cookie-stale-text {
+  flex: 0 1 auto;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.cookie-stale-link {
+  color: #fde68a;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.cookie-stale-link:hover {
+  color: #ffffff;
+}
+
+.cookie-stale-dismiss {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #fbbf24;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  line-height: 0;
+}
+
+.cookie-stale-dismiss:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+}
