@@ -9,6 +9,7 @@ import { getRuntimeConfig } from "@/lib/config";
 const navItems = [
   { label: "Search", href: "/search" },
   { label: "Jobs", href: "/jobs" },
+  { label: "Settings", href: "/settings" },
 ];
 
 function isCurrent(href: string, pathname: string) {

@@ -37,11 +37,12 @@ export default function JobsPage() {
 
   const stats = useMemo(() => {
     const total = jobs.length;
+    const pending = jobs.filter((j) => j.status === "pending").length;
     const running = jobs.filter((j) => j.status === "running" || j.status === "pending").length;
     const success = jobs.filter((j) => j.status === "success").length;
     const failed = jobs.filter((j) => j.status === "failed").length;
     const partial = jobs.filter((j) => j.songs.some((s) => s.status === "failed")).length;
-    return { total, running, success, failed, partial };
+    return { total, pending, running, success, failed, partial };
   }, [jobs]);
 
   const filteredJobs = useMemo(() => {
@@ -54,6 +55,7 @@ export default function JobsPage() {
   const pills = useMemo(() => {
     const counts: Record<StatusFilter, number> = {
       all: stats.total,
+      pending: stats.pending,
       running: stats.running,
       success: stats.success,
       partial: stats.partial,

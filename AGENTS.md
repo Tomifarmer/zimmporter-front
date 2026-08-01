@@ -25,10 +25,11 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 ## Project Structure
 - `src/proxy.ts` — Next.js 16 proxy; redirects unauthenticated users to `/login` when `USE_SOCIAL_LOGIN=true`
 - `src/app/api/config/route.ts` — runtime config endpoint (reads `API_URL` and `API_KEY` from server env)
-- `src/app/` — App Router pages (`(app)/page.tsx`, `(app)/search/`, `(app)/jobs/`, `(auth)/login/`)
+- `src/app/` — App Router pages (`(app)/page.tsx`, `(app)/search/`, `(app)/jobs/`, `(app)/settings/`, `(auth)/login/`)
 - `src/components/ApiKeyErrorOverlay.tsx` — full-page overlay when backend requires API key but none configured
 - `src/components/SocialLoginErrorOverlay.tsx` — full-page overlay when backend requires auth but no session active
 - `src/components/AuthConflictOverlay.tsx` — full-page overlay when both `USE_SOCIAL_LOGIN` and `USE_SIMPLE_AUTH` are enabled
+- `src/components/CookieManager.tsx` — Settings page card for uploading the yt-dlp cookies file (`GET`/`POST /cookies`)
 - `src/lib/api.ts` — single axios client; auth interceptors for `X-API-Key` and Bearer token
 - `src/lib/auth.ts` — NextAuth v5 config; OIDC/GitHub providers, JWT/session image passthrough
 - `src/lib/config.ts` — `RuntimeConfig` type with `useSocialLogin`, `useSimpleAuth`, `apiUrl`, `apiKey`

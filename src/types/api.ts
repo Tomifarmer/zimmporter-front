@@ -54,3 +54,11 @@ export interface JobStatusResponse {
   created_at: string;
   updated_at: string;
 }
+
+export interface CookieStatus {
+  exists: boolean;
+  size: number;
+  cookie_count: number;
+  domains: string[];
+  modified_at: string | null;
+}
