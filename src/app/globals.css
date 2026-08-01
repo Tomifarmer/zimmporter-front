@@ -20,8 +20,7 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html {
   height: 100%;
 }
 
@@ -30,13 +29,15 @@ body {
   color: #e2e8f0;
   background-color: #0f172a;
   position: relative;
+  min-height: 100%;
+  padding-bottom: 100px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .page-container {
   max-width: 1480px;
-  margin: 50px auto 100px auto;
+  margin: 50px auto 0;
   border-radius: 0.5rem;
   padding: 20px;
   background-color: #0f172a;
