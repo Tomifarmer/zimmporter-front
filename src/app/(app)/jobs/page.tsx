@@ -236,15 +236,24 @@ export default function JobsPage() {
         <div>
           {filteredJobs.map((job) => (
             <div key={job.job_id} className="jobs-card-wrapper">
-              <div className="jobs-card-select-row">
+              <div
+                className={`jobs-card-select-row${isRetryable(job) ? "" : " jobs-card-select-row--no-checkbox"}`}
+              >
                 {isRetryable(job) && (
-                  <label className="job-select-label" title="Select to retry">
+                  <label className="job-select-checkbox-wrapper" title="Select to retry">
                     <input
                       type="checkbox"
-                      className="job-select-checkbox"
+                      className="job-select-checkbox-input"
                       checked={selected.has(job.job_id)}
                       onChange={() => toggleSelect(job.job_id)}
                     />
+                    <span
+                      className={`job-select-checkbox-custom${selected.has(job.job_id) ? " job-select-checkbox-custom--checked" : ""}`}
+                    >
+                      {selected.has(job.job_id) && (
+                        <span className="job-select-checkmark">{"\u2713"}</span>
+                      )}
+                    </span>
                   </label>
                 )}
                 <JobRow job={job} />
