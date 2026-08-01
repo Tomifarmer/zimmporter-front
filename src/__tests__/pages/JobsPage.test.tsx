@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { clearApiMocks, mockApi, mockApiGet } from "@/__tests__/helpers/api-mock";
-import { buildJob } from "@/__tests__/helpers/factories";
+import { buildJob, buildSong } from "@/__tests__/helpers/factories";
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -143,6 +143,105 @@ describe("JobsPage", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Auto-refreshing")).toBeInTheDocument();
+    });
+  });
+});
+
+describe("JobsPage retry selection", () => {
+  beforeEach(() => {
+    clearApiMocks();
+  });
+
+  const retryableJob = (id: number) =>
+    buildJob({
+      job_id: id,
+      status: "failed",
+      error: "boom",
+      songs: [buildSong({ id: 1, status: "failed", error: "boom" })],
+    });
+
+  it("shows a checkbox only for retryable jobs (with failed songs)", async () => {
+    mockApiGet([retryableJob(1), buildJob({ job_id: 2, status: "success", songs: [] })]);
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getAllByRole("checkbox")).toHaveLength(1);
+    });
+  });
+
+  it("retry button is disabled when nothing is selected", async () => {
+    mockApiGet([retryableJob(1)]);
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText("Retry selected (0)")).toBeDisabled();
+    });
+  });
+
+  it("posts to /jobs/{id}/retry for each selected job and clears selection", async () => {
+    mockApiGet([retryableJob(1), retryableJob(2)]);
+    mockApi.post.mockResolvedValue({ data: { job_id: 1, status: "running" } });
+    const user = userEvent.setup();
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getAllByRole("checkbox")).toHaveLength(2);
+    });
+
+    await user.click(screen.getAllByRole("checkbox")[1]);
+    expect(screen.getByText("Retry selected (1)")).toBeEnabled();
+
+    await user.click(screen.getByText("Retry selected (1)"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Retried 1 job(s).")).toBeInTheDocument();
+    });
+    expect(mockApi.post).toHaveBeenCalledWith("/jobs/1/retry");
+    expect(screen.getByText("Retry selected (0)")).toBeDisabled();
+  });
+
+  it("select all selects every retryable job on the page", async () => {
+    mockApiGet([
+      retryableJob(1),
+      retryableJob(2),
+      buildJob({ job_id: 3, status: "success", songs: [] }),
+    ]);
+    const user = userEvent.setup();
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getAllByRole("checkbox")).toHaveLength(2);
+    });
+
+    await user.click(screen.getByText("Select all"));
+    expect(screen.getByText("Retry selected (2)")).toBeEnabled();
+  });
+
+  it("shows error feedback when a retry fails", async () => {
+    mockApiGet([retryableJob(1)]);
+    mockApi.post.mockRejectedValue(new Error("boom"));
+    const user = userEvent.setup();
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getAllByRole("checkbox")).toHaveLength(1);
+    });
+
+    await user.click(screen.getAllByRole("checkbox")[0]);
+    await user.click(screen.getByText("Retry selected (1)"));
+
+    await waitFor(() => {
+      expect(screen.getByText("0 job(s) retried, 1 failed.")).toBeInTheDocument();
     });
   });
 });

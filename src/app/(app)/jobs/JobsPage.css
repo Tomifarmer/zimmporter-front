@@ -72,6 +72,116 @@
   font-weight: 600;
 }
 
+.jobs-select-toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.jobs-select-btn {
+  padding: 0.375rem 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid #334155;
+  background-color: transparent;
+  color: #94a3b8;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.jobs-select-btn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+.jobs-select-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.jobs-toolbar-retry-btn {
+  padding: 0.375rem 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid #3b82f6;
+  background-color: #3b82f622;
+  color: #60a5fa;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.jobs-toolbar-retry-btn:hover:not(:disabled) {
+  background-color: #3b82f644;
+  color: #ffffff;
+}
+
+.jobs-toolbar-retry-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.jobs-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid #22c55e;
+  background-color: #22c55e22;
+  color: #86efac;
+  font-size: 0.8125rem;
+}
+
+.jobs-feedback--error {
+  border-color: #ef4444;
+  background-color: #ef444422;
+  color: #fca5a5;
+}
+
+.jobs-feedback-dismiss {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  opacity: 0.7;
+}
+
+.jobs-feedback-dismiss:hover {
+  opacity: 1;
+}
+
+.jobs-card-select-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.job-select-label {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 0.875rem;
+  cursor: pointer;
+}
+
+.job-select-checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.jobs-card-select-row > .job-row-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
 .jobs-loading-wrapper {
   display: flex;
   justify-content: center;

@@ -1,11 +1,15 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import JobRow from "@/components/JobRow";
 import { COLORS } from "@/config/colors";
 import { api } from "@/lib/api";
 import type { JobStatusResponse } from "@/types/api";
+
+function isRetryable(job: JobStatusResponse): boolean {
+  return job.songs.some((s) => s.status === "failed");
+}
 
 type StatusFilter = "all" | "pending" | "running" | "success" | "failed" | "partial";
 
@@ -20,6 +24,10 @@ const FILTER_OPTIONS: { label: string; value: StatusFilter; color: string }[] = 
 export default function JobsPage() {
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [retrying, setRetrying] = useState(false);
+  const [feedback, setFeedback] = useState<{ text: string; isError: boolean } | null>(null);
+  const queryClient = useQueryClient();
   const limit = 20;
 
   const jobsQuery = useQuery<JobStatusResponse[]>({
@@ -63,6 +71,64 @@ export default function JobsPage() {
     };
     return FILTER_OPTIONS.map((opt) => ({ ...opt, count: counts[opt.value] }));
   }, [stats]);
+
+  const retryableIds = useMemo(
+    () => filteredJobs.filter(isRetryable).map((j) => j.job_id),
+    [filteredJobs],
+  );
+
+  const allSelectedOnPage = retryableIds.length > 0 && retryableIds.every((id) => selected.has(id));
+
+  const toggleSelect = (jobId: number) => {
+    setFeedback(null);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(jobId)) next.delete(jobId);
+      else next.add(jobId);
+      return next;
+    });
+  };
+
+  const toggleSelectAllOnPage = () => {
+    setFeedback(null);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allSelectedOnPage)
+        retryableIds.forEach((id) => {
+          next.delete(id);
+        });
+      else
+        retryableIds.forEach((id) => {
+          next.add(id);
+        });
+      return next;
+    });
+  };
+
+  const clearSelection = () => {
+    setFeedback(null);
+    setSelected(new Set());
+  };
+
+  const retrySelected = async () => {
+    if (selected.size === 0 || retrying) return;
+    setRetrying(true);
+    setFeedback(null);
+    const results = await Promise.allSettled(
+      [...selected].map((id) => api.post(`/jobs/${id}/retry`)),
+    );
+    const failedCount = results.filter((r) => r.status === "rejected").length;
+    setSelected(new Set());
+    await queryClient.invalidateQueries({ queryKey: ["jobs", page, limit] });
+    setRetrying(false);
+    setFeedback({
+      text:
+        failedCount === 0
+          ? `Retried ${results.length} job(s).`
+          : `${results.length - failedCount} job(s) retried, ${failedCount} failed.`,
+      isError: failedCount > 0,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -109,6 +175,44 @@ export default function JobsPage() {
         </div>
       )}
 
+      {jobs.length > 0 && retryableIds.length > 0 && (
+        <div className="jobs-select-toolbar-row">
+          <button
+            type="button"
+            onClick={toggleSelectAllOnPage}
+            disabled={retrying}
+            className="jobs-select-btn"
+          >
+            {allSelectedOnPage ? "Deselect all" : "Select all"}
+          </button>
+          <button
+            type="button"
+            onClick={clearSelection}
+            disabled={retrying || selected.size === 0}
+            className="jobs-select-btn"
+          >
+            Clear
+          </button>
+          <button
+            type="button"
+            onClick={retrySelected}
+            disabled={selected.size === 0 || retrying}
+            className="jobs-toolbar-retry-btn"
+          >
+            {retrying ? "Retrying\u2026" : `Retry selected (${selected.size})`}
+          </button>
+        </div>
+      )}
+
+      {feedback && (
+        <div className={`jobs-feedback${feedback.isError ? " jobs-feedback--error" : ""}`}>
+          <span>{feedback.text}</span>
+          <button type="button" className="jobs-feedback-dismiss" onClick={() => setFeedback(null)}>
+            ×
+          </button>
+        </div>
+      )}
+
       {jobsQuery.isLoading && (
         <div className="jobs-loading-wrapper">
           <i className="pi pi-spin pi-spinner jobs-loading-icon" />
@@ -132,7 +236,19 @@ export default function JobsPage() {
         <div>
           {filteredJobs.map((job) => (
             <div key={job.job_id} className="jobs-card-wrapper">
-              <JobRow job={job} />
+              <div className="jobs-card-select-row">
+                {isRetryable(job) && (
+                  <label className="job-select-label" title="Select to retry">
+                    <input
+                      type="checkbox"
+                      className="job-select-checkbox"
+                      checked={selected.has(job.job_id)}
+                      onChange={() => toggleSelect(job.job_id)}
+                    />
+                  </label>
+                )}
+                <JobRow job={job} />
+              </div>
             </div>
           ))}
         </div>
