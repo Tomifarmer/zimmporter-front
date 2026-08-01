@@ -45,6 +45,8 @@ npm run lint   # biome check (lint + format + imports)
 
 `USE_SOCIAL_LOGIN` and `USE_SIMPLE_AUTH` cannot both be `true`; the app shows an error overlay if both are enabled.
 
+If `API_URL` is set to a value that does not start with `http://` or `https://`, the server logs an error and exits with code 1 at startup.
+
 Set in `.env.local` for local development, or via container environment at runtime.
 
 ## Pages
@@ -55,6 +57,7 @@ Set in `.env.local` for local development, or via container environment at runti
 | `/search` | Search YouTube Music for albums, featured playlists, or community playlists — multi-select, batch download |
 | `/jobs` | Paginated jobs list with progress bars |
 | `/jobs/[id]` | Job detail — live polling (3s), songs table |
+| `/settings` | YouTube cookies management — upload cookies file for age-restricted downloads |
 
 ### Dashboard (`/`)
 
@@ -65,7 +68,8 @@ Set in `.env.local` for local development, or via container environment at runti
 
 ### Search (`/search`)
 
-- Search input (Enter to submit)
+- Search input (Enter to submit), auto-focused on page load
+- Typing anywhere on the page (when not focused on another input) starts or refines the query; Backspace deletes from it
 - Albums / Featured Playlists / Community Playlists type selector
 - Multi-select results with checkboxes
 - Green `pi-check-circle` badge on covers of albums/playlists already in the library (`available` flag from the API)
@@ -77,9 +81,16 @@ Set in `.env.local` for local development, or via container environment at runti
 ### Jobs (`/jobs`)
 
 - Paginated table (20 jobs per page)
+- Interactive status-pill toolbar (Total / Running / Completed / Partial / Failed) — each pill is a filter button showing a colored dot and live count
 - Each row shows job ID, type, progress bar, status badge, timestamp
 - Click arrow to expand message and error details inline
 - Auto-refreshes every 5s
+
+### Settings (`/settings`)
+
+- YouTube cookies status card: badge (Configured / Not configured / Stale), cookie count, domains, last-updated timestamp
+- Upload a Netscape-format cookies file (`.txt`, `.cookies`, `.tidycookies`) via `POST /cookies`; upload errors shown inline
+- A stale-cookie warning banner appears at the top of every page (amber, `role="alert"`, re-checked every 60s) linking to this page
 
 ### Job Detail (`/jobs/[id]`)
 
@@ -103,11 +114,12 @@ src/
     globals.css               # CSS imports
     not-found.tsx             # Custom 404 page
     (app)/
-      layout.tsx              # App layout — Header, LightfallBackground, PageContainer, Footer, overlays
+      layout.tsx              # App layout — Header, LightfallBackground, PageContainer, Footer, overlays, stale-cookie banner
       page.tsx                # Dashboard page
       search/page.tsx         # Search page
       jobs/page.tsx           # Jobs list page
       jobs/[id]/page.tsx      # Job detail page
+      settings/page.tsx       # Settings page (YouTube cookies)
     (auth)/
       layout.tsx              # Auth layout (bare, no header)
       login/page.tsx          # Login page (server)
@@ -127,6 +139,8 @@ src/
     ApiKeyErrorOverlay.tsx    # Full-page overlay when API key required but missing
     AuthConflictOverlay.tsx   # Full-page overlay when both USE_SOCIAL_LOGIN and USE_SIMPLE_AUTH are true
     SocialLoginErrorOverlay.tsx  # Full-page overlay when social login required but no session
+    CookieManager.tsx         # Settings card — upload the yt-dlp cookies file (GET/POST /cookies)
+    CookieStaleBanner.tsx     # Warning banner when the backend flags cookies as stale
   hooks/
     useJobPolling.ts          # Polling hook (3s while pending/running)
   lib/
@@ -204,10 +218,11 @@ The `test` job runs `npm ci && npm run lint && npm test` on every trigger. The `
 
 All types defined in `src/types/api.ts`:
 
-- **SearchResult** — album/playlist/item from search
+- **SearchResult** — album/playlist/item from search (includes `available?: boolean` flag)
 - **SearchResponse** — array of search results
 - **DownloadRequest** — id and concurrent fields
 - **JobResponse** — job_id and status
 - **JobStatusResponse** — full job with embedded songs
 - **Song** — per-song status and metadata
 - **HealthResponse** — component health status
+- **CookieStatus** — cookies file metadata (`exists`, `size`, `cookie_count`, `domains`, `modified_at`, `is_stale`)
