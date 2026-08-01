@@ -288,6 +288,23 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
+  position: relative;
+}
+
+.result-card-available {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: rgba(15, 23, 42, 0.75);
+  color: #22c55e;
+  font-size: 1.375rem;
 }
 
 .result-card-img {

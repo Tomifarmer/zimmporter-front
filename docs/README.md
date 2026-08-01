@@ -68,6 +68,7 @@ Set in `.env.local` for local development, or via container environment at runti
 - Search input (Enter to submit)
 - Albums / Featured Playlists / Community Playlists type selector
 - Multi-select results with checkboxes
+- Green `pi-check-circle` badge on covers of albums/playlists already in the library (`available` flag from the API)
 - Concurrent downloads slider (1–32, default 4)
 - Select All toggle button
 - Download Selected button sends `POST /download/album` or `/download/playlist`

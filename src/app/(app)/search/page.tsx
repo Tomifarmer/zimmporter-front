@@ -297,6 +297,11 @@ function ResultCard({
     <div>
       <Card className={`result-card h-100${checked ? " card-glow" : ""}`}>
         <div className="result-card-img-wrapper">
+          {result.available && (
+            <div className="result-card-available" title="Already in library">
+              <i className="pi pi-check-circle" />
+            </div>
+          )}
           {result.thumbnail && imageLoaded ? (
             <img
               src={result.thumbnail}

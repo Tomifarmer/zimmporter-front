@@ -10,6 +10,7 @@ export function buildSearchResult(overrides?: Partial<SearchResult>): SearchResu
     type: "Album",
     trackCount: 12,
     thumbnail: "https://example.com/thumb.jpg",
+    available: false,
     ...overrides,
   };
 }

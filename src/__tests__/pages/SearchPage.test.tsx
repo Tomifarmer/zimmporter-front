@@ -145,6 +145,29 @@ describe("SearchPage", () => {
     });
   });
 
+  it("shows green check badge for already-available albums", async () => {
+    const user = userEvent.setup();
+    const results = [
+      buildSearchResult({ browseId: "avail-id", title: "Available Album", available: true }),
+      buildSearchResult({ browseId: "other-id", title: "New Album", available: false }),
+    ];
+    mockApiGet(buildSearchResponse({ results }));
+
+    const SearchPage = await importSearchPage();
+    render(<SearchPage />, { wrapper: createWrapper() });
+
+    const input = screen.getByPlaceholderText("Search for albums or playlists...");
+    await user.type(input, "available");
+    await user.keyboard("{Enter}");
+
+    await waitFor(() => {
+      expect(screen.getByText("Available Album")).toBeInTheDocument();
+      expect(screen.getByText("New Album")).toBeInTheDocument();
+    });
+
+    expect(screen.getAllByTitle("Already in library")).toHaveLength(1);
+  });
+
   it("opens and closes settings panel", async () => {
     const user = userEvent.setup();
     const results = [buildSearchResult({ browseId: "set-id", title: "Settings Album" })];

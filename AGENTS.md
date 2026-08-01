@@ -36,7 +36,7 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 - `src/hooks/useJobPolling.ts` — polls job status every 3s while pending/running
 - `src/providers/auth-provider.tsx` — wraps children in `SessionProvider` when `useSocialLogin` prop is true
 - `src/providers/query-provider.tsx` — React Query wrapper (all pages are inside it)
-- `src/types/api.ts` — shared TypeScript types for API responses
+- `src/types/api.ts` — shared TypeScript types for API responses (`SearchResult.available` flags albums already in the library)
 
 Path alias: `@/*` maps to `src/*`.
 

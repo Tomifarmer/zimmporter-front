@@ -12,6 +12,7 @@ export interface SearchResult {
   name?: string[];
   subscribers?: string;
   trackCount?: number;
+  available?: boolean;
 }
 
 export interface SearchResponse {
