@@ -10,9 +10,9 @@ import type { JobStatusResponse } from "@/types/api";
 type StatusFilter = "all" | "pending" | "running" | "success" | "failed" | "partial";
 
 const FILTER_OPTIONS: { label: string; value: StatusFilter; color: string }[] = [
-  { label: "All", value: "all", color: COLORS.blue },
+  { label: "Total", value: "all", color: COLORS.blue },
   { label: "Running", value: "running", color: COLORS.turquoise },
-  { label: "Success", value: "success", color: "#22c55e" },
+  { label: "Completed", value: "success", color: "#22c55e" },
   { label: "Partial", value: "partial", color: "#f59e0b" },
   { label: "Failed", value: "failed", color: "#ef4444" },
 ];
@@ -51,6 +51,17 @@ export default function JobsPage() {
     return jobs.filter((j) => j.status === statusFilter);
   }, [jobs, statusFilter]);
 
+  const pills = useMemo(() => {
+    const counts: Record<StatusFilter, number> = {
+      all: stats.total,
+      running: stats.running,
+      success: stats.success,
+      partial: stats.partial,
+      failed: stats.failed,
+    };
+    return FILTER_OPTIONS.map((opt) => ({ ...opt, count: counts[opt.value] }));
+  }, [stats]);
+
   return (
     <div className="space-y-6">
       <div className="jobs-header-row">
@@ -64,49 +75,32 @@ export default function JobsPage() {
       </div>
 
       {jobs.length > 0 && (
-        <div className="jobs-stats-row">
-          {[
-            { label: "Total", value: stats.total, color: COLORS.blue },
-            { label: "Running", value: stats.running, color: COLORS.turquoise },
-            { label: "Completed", value: stats.success, color: "#22c55e" },
-            { label: "Partial", value: stats.partial, color: "#f59e0b" },
-            { label: "Failed", value: stats.failed, color: "#ef4444" },
-          ].map((stat) => (
-            <div key={stat.label} className="jobs-stat-pill">
-              <div
-                className="jobs-stat-dot"
-                style={{ "--stat-color": stat.color } as React.CSSProperties}
-              />
-              <span className="jobs-stat-label">{stat.label}</span>
-              <span className="jobs-stat-value">{stat.value}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {jobs.length > 0 && (
-        <div className="jobs-filter-row">
-          {FILTER_OPTIONS.map((opt) => {
-            const active = statusFilter === opt.value;
+        <div className="jobs-toolbar-row">
+          {pills.map((pill) => {
+            const active = statusFilter === pill.value;
             return (
               <button
                 type="button"
-                key={opt.value}
+                key={pill.value}
+                aria-pressed={active}
                 onClick={() => {
                   setPage(0);
-                  setStatusFilter(opt.value);
+                  setStatusFilter(pill.value);
                 }}
-                className="jobs-filter-btn"
+                className="jobs-toolbar-pill"
                 style={
                   {
-                    "--filter-border": active ? opt.color : "#334155",
-                    "--filter-bg": active ? `${opt.color}22` : "transparent",
-                    "--filter-color": active ? opt.color : "#64748b",
-                    "--filter-weight": active ? 600 : 400,
+                    "--toolbar-border": active ? pill.color : "#334155",
+                    "--toolbar-bg": active ? `${pill.color}22` : "#1e293b",
+                    "--toolbar-color": active ? pill.color : "#94a3b8",
+                    "--toolbar-dot": pill.color,
+                    "--toolbar-weight": active ? 600 : 400,
                   } as React.CSSProperties
                 }
               >
-                {opt.label}
+                <span className="jobs-toolbar-dot" />
+                <span className="jobs-toolbar-label">{pill.label}</span>
+                <span className="jobs-toolbar-count">{pill.count}</span>
               </button>
             );
           })}

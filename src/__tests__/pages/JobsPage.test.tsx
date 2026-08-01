@@ -87,8 +87,8 @@ describe("JobsPage", () => {
       expect(screen.getByText("Job #1")).toBeInTheDocument();
     });
 
-    const failedButtons = screen.getAllByText("Failed");
-    await user.click(failedButtons[1]);
+    const failedButton = screen.getByText("Failed");
+    await user.click(failedButton);
 
     await waitFor(() => {
       expect(screen.getByText(/No jobs match/)).toBeInTheDocument();
