@@ -20,7 +20,14 @@ function relativeTime(dateStr: string | null | undefined): string {
   return `${days}d ago`;
 }
 
-export default function JobRow({ job }: { job: JobStatusResponse }) {
+type JobRowProps = {
+  job: JobStatusResponse;
+  selectable?: boolean;
+  checked?: boolean;
+  onToggleSelect?: () => void;
+};
+
+export default function JobRow({ job, selectable, checked, onToggleSelect }: JobRowProps) {
   const pct = job.total_songs > 0 ? Math.round((job.songs_downloaded / job.total_songs) * 100) : 0;
   const isRunning = job.status === "running" || job.status === "pending";
   const isFailed = job.status === "failed";
@@ -48,10 +55,31 @@ export default function JobRow({ job }: { job: JobStatusResponse }) {
       >
         <div className="job-row-top-row">
           <div className="job-row-info-row">
-            <div
-              className="job-row-dot"
-              style={{ "--dot-color": dotColor } as React.CSSProperties}
-            />
+            {selectable ? (
+              <label
+                className="job-row-checkbox-wrapper"
+                title="Select to retry"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+              >
+                <input
+                  type="checkbox"
+                  className="job-row-checkbox-input"
+                  checked={checked}
+                  onChange={onToggleSelect}
+                />
+                <span
+                  className={`job-row-checkbox-custom${checked ? " job-row-checkbox-custom--checked" : ""}`}
+                >
+                  {checked && <span className="job-row-checkmark">{"\u2713"}</span>}
+                </span>
+              </label>
+            ) : (
+              <div
+                className="job-row-dot"
+                style={{ "--dot-color": dotColor } as React.CSSProperties}
+              />
+            )}
             <span className="job-row-id">Job #{job.job_id}</span>
             <span
               className="job-row-type-badge"
