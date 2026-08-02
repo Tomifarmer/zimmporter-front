@@ -32,20 +32,28 @@ export default function JobRow({ job, selectable, checked, onToggleSelect }: Job
   const isRunning = job.status === "running" || job.status === "pending";
   const isFailed = job.status === "failed";
   const isSuccess = job.status === "success";
-  const displayStatus =
-    isSuccess && job.songs?.some((s) => s.status === "failed") ? "partial" : job.status;
+  const isPartial = isSuccess && job.songs?.some((s) => s.status === "failed");
+  const displayStatus = isPartial ? "partial" : job.status;
 
   const cardBorderColor = isFailed ? "#ef4444" : isRunning ? COLORS.turquoise : "#334155";
   const dotColor = isRunning
     ? COLORS.turquoise
-    : isSuccess
-      ? "#22c55e"
-      : isFailed
-        ? "#ef4444"
-        : "#475569";
+    : isPartial
+      ? "#f59e0b"
+      : isSuccess
+        ? "#22c55e"
+        : isFailed
+          ? "#ef4444"
+          : "#475569";
   const badgeBg = job.job_type === "album" ? `${COLORS.blue}22` : `${COLORS.turquoise}22`;
   const badgeColor = job.job_type === "album" ? COLORS.blue : COLORS.turquoise;
-  const progressColor = isFailed ? "#ef4444" : isSuccess ? "#22c55e" : COLORS.blue;
+  const progressColor = isFailed
+    ? "#ef4444"
+    : isPartial
+      ? "#f59e0b"
+      : isSuccess
+        ? "#22c55e"
+        : COLORS.blue;
 
   return (
     <a href={`/jobs/${job.job_id}`} className="job-row-wrapper text-decoration-none">

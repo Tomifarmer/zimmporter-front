@@ -71,6 +71,39 @@ describe("JobRow", () => {
     expect(screen.getByText("partial")).toBeInTheDocument();
   });
 
+  it("renders the progress fill amber for partial jobs", () => {
+    const job = buildJob({
+      status: "success",
+      songs_downloaded: 5,
+      total_songs: 6,
+      songs: [
+        {
+          id: 1,
+          title: "S1",
+          artist: "A",
+          album: "B",
+          track_number: 1,
+          status: "success",
+          s3_path: null,
+          error: null,
+        },
+        {
+          id: 2,
+          title: "S2",
+          artist: "A",
+          album: "B",
+          track_number: 2,
+          status: "failed",
+          s3_path: null,
+          error: "err",
+        },
+      ],
+    });
+    const { container } = render(<JobRow job={job} />);
+    const fill = container.querySelector(".job-row-progress-fill") as HTMLElement;
+    expect(fill.style.getPropertyValue("--progress-color")).toBe("#f59e0b");
+  });
+
   it("renders relative created time", () => {
     const recent = new Date(Date.now() - 30_000).toISOString();
     const job = buildJob({ created_at: recent, updated_at: recent });

@@ -66,9 +66,16 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
   const isSuccess = data.status === "success";
   const isFailed = data.status === "failed";
   const failedCount = data.songs.filter((s) => s.status === "failed").length;
-  const displayStatus = isSuccess && failedCount > 0 ? "partial" : data.status;
+  const isPartial = isSuccess && failedCount > 0;
+  const displayStatus = isPartial ? "partial" : data.status;
 
-  const progressColor = isFailed ? "#ef4444" : isSuccess ? "#22c55e" : COLORS.blue;
+  const progressColor = isFailed
+    ? "#ef4444"
+    : isPartial
+      ? "#f59e0b"
+      : isSuccess
+        ? "#22c55e"
+        : COLORS.blue;
 
   return (
     <div className="space-y-6">
@@ -111,7 +118,7 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
         </div>
       </div>
 
-      {data.total_songs > 0 && !isSuccess && (
+      {data.total_songs > 0 && (!isSuccess || isPartial) && (
         <div className="jd-progress-section">
           <div className="jd-progress-row">
             <span className="jd-progress-label">Progress</span>

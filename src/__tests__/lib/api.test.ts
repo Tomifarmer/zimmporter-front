@@ -1,4 +1,5 @@
 import type { InternalAxiosRequestConfig } from "axios";
+import { AxiosHeaders } from "axios";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("api auth interceptor", () => {
@@ -11,7 +12,8 @@ describe("api auth interceptor", () => {
   }
 
   function makeConfig(): InternalAxiosRequestConfig {
-    return { headers: { common: {} } } as InternalAxiosRequestConfig;
+    const config = { headers: new AxiosHeaders() } as InternalAxiosRequestConfig;
+    return config;
   }
 
   async function runInterceptor(token?: string) {
@@ -19,9 +21,9 @@ describe("api auth interceptor", () => {
     mod.setAccessToken(token);
 
     const config = makeConfig();
-    return mod.api.interceptors.request.handlers?.[0]?.fulfilled(
-      config,
-    ) as Promise<InternalAxiosRequestConfig>;
+    const handler = mod.api.interceptors.request.handlers?.[0];
+    if (!handler?.fulfilled) return config;
+    return (await handler.fulfilled(config)) ?? config;
   }
 
   it("adds Authorization header when access token is set", async () => {
@@ -40,9 +42,8 @@ describe("api auth interceptor", () => {
     mod.setAccessToken("second-token");
 
     const config = makeConfig();
-    const result = (await mod.api.interceptors.request.handlers?.[0]?.fulfilled(
-      config,
-    )) as Promise<InternalAxiosRequestConfig>;
+    const handler = mod.api.interceptors.request.handlers?.[0];
+    const result = (await handler?.fulfilled(config)) ?? config;
 
     expect(result.headers.Authorization).toBe("Bearer second-token");
   });

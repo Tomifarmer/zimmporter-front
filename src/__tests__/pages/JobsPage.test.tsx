@@ -64,6 +64,41 @@ describe("JobsPage", () => {
     });
   });
 
+  it("counts partial jobs only under Partial, not Completed", async () => {
+    const user = userEvent.setup();
+    const jobs = [
+      buildJob({
+        job_id: 1,
+        status: "success",
+        songs: [
+          buildSong({ id: 1, status: "success" }),
+          buildSong({ id: 2, status: "failed", error: "err" }),
+        ],
+      }),
+      buildJob({ job_id: 2, status: "success", songs: [buildSong({ id: 3, status: "success" })] }),
+    ];
+    mockApiGet(jobs);
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText("Job #1")).toBeInTheDocument();
+      expect(screen.getByText("Job #2")).toBeInTheDocument();
+    });
+
+    const completedPill = screen.getByRole("button", { name: /Completed/ });
+    const partialPill = screen.getByRole("button", { name: /Partial/ });
+    expect(completedPill.textContent).toContain("1");
+    expect(partialPill.textContent).toContain("1");
+
+    await user.click(completedPill);
+    await waitFor(() => {
+      expect(screen.getByText("Job #2")).toBeInTheDocument();
+    });
+    expect(screen.queryByText("Job #1")).not.toBeInTheDocument();
+  });
+
   it("shows empty state when no jobs exist", async () => {
     mockApiGet([]);
 

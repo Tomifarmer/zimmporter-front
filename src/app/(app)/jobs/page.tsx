@@ -7,6 +7,10 @@ import { COLORS } from "@/config/colors";
 import { api } from "@/lib/api";
 import type { JobStatusResponse } from "@/types/api";
 
+function isPartial(job: JobStatusResponse): boolean {
+  return job.status === "success" && job.songs.some((s) => s.status === "failed");
+}
+
 function isRetryable(job: JobStatusResponse): boolean {
   return job.songs.some((s) => s.status === "failed");
 }
@@ -47,7 +51,7 @@ export default function JobsPage() {
     const total = jobs.length;
     const pending = jobs.filter((j) => j.status === "pending").length;
     const running = jobs.filter((j) => j.status === "running" || j.status === "pending").length;
-    const success = jobs.filter((j) => j.status === "success").length;
+    const success = jobs.filter((j) => j.status === "success" && !isPartial(j)).length;
     const failed = jobs.filter((j) => j.status === "failed").length;
     const partial = jobs.filter((j) => j.songs.some((s) => s.status === "failed")).length;
     return { total, pending, running, success, failed, partial };
@@ -57,7 +61,7 @@ export default function JobsPage() {
     if (statusFilter === "all") return jobs;
     if (statusFilter === "partial")
       return jobs.filter((j) => j.songs.some((s) => s.status === "failed"));
-    return jobs.filter((j) => j.status === statusFilter);
+    return jobs.filter((j) => j.status === statusFilter && !isPartial(j));
   }, [jobs, statusFilter]);
 
   const pills = useMemo(() => {
