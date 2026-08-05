@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { clearApiMocks, mockApi, mockApiGet } from "@/__tests__/helpers/api-mock";
+import { clearApiMocks, mockApi, mockApiGet, mockApiGetUrl } from "@/__tests__/helpers/api-mock";
 import { buildJob, buildSong } from "@/__tests__/helpers/factories";
 
 function createWrapper() {
@@ -97,6 +97,32 @@ describe("JobsPage", () => {
       expect(screen.getByText("Job #2")).toBeInTheDocument();
     });
     expect(screen.queryByText("Job #1")).not.toBeInTheDocument();
+  });
+
+  it("uses global stats counts from /jobs/stats across pages", async () => {
+    mockApiGetUrl(
+      "/jobs",
+      Array.from({ length: 20 }, (_, i) => buildJob({ job_id: i + 1, status: "success" })),
+    );
+    mockApiGetUrl("/jobs/stats", {
+      total: 57,
+      pending: 0,
+      running: 3,
+      success: 52,
+      failed: 1,
+      partial: 4,
+    });
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText("57")).toBeInTheDocument();
+      expect(screen.getByText("3")).toBeInTheDocument();
+      expect(screen.getByText("52")).toBeInTheDocument();
+      expect(screen.getByText("4")).toBeInTheDocument();
+      expect(screen.getByText("1")).toBeInTheDocument();
+    });
   });
 
   it("shows empty state when no jobs exist", async () => {

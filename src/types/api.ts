@@ -56,6 +56,15 @@ export interface JobStatusResponse {
   updated_at: string;
 }
 
+export interface JobStatsResponse {
+  total: number;
+  pending: number;
+  running: number;
+  success: number;
+  failed: number;
+  partial: number;
+}
+
 export interface CookieStatus {
   exists: boolean;
   size: number;

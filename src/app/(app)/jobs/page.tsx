@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import JobRow from "@/components/JobRow";
 import { COLORS } from "@/config/colors";
 import { api } from "@/lib/api";
-import type { JobStatusResponse } from "@/types/api";
+import type { JobStatsResponse, JobStatusResponse } from "@/types/api";
 
 function isPartial(job: JobStatusResponse): boolean {
   return job.status === "success" && job.songs.some((s) => s.status === "failed");
@@ -47,7 +47,16 @@ export default function JobsPage() {
 
   const jobs = jobsQuery.data || [];
 
-  const stats = useMemo(() => {
+  const statsQuery = useQuery<JobStatsResponse>({
+    queryKey: ["job-stats"],
+    queryFn: async () => {
+      const { data } = await api.get<JobStatsResponse>("/jobs/stats");
+      return data;
+    },
+    refetchInterval: 5000,
+  });
+
+  const pageStats = useMemo(() => {
     const total = jobs.length;
     const pending = jobs.filter((j) => j.status === "pending").length;
     const running = jobs.filter((j) => j.status === "running" || j.status === "pending").length;
@@ -56,6 +65,11 @@ export default function JobsPage() {
     const partial = jobs.filter((j) => j.songs.some((s) => s.status === "failed")).length;
     return { total, pending, running, success, failed, partial };
   }, [jobs]);
+
+  const stats =
+    statsQuery.data && typeof statsQuery.data === "object" && "total" in statsQuery.data
+      ? statsQuery.data
+      : pageStats;
 
   const filteredJobs = useMemo(() => {
     if (statusFilter === "all") return jobs;
@@ -124,6 +138,7 @@ export default function JobsPage() {
     const failedCount = results.filter((r) => r.status === "rejected").length;
     setSelected(new Set());
     await queryClient.invalidateQueries({ queryKey: ["jobs", page, limit] });
+    await queryClient.invalidateQueries({ queryKey: ["job-stats"] });
     setRetrying(false);
     setFeedback({
       text:
