@@ -35,10 +35,14 @@ export default function JobsPage() {
   const limit = 20;
 
   const jobsQuery = useQuery<JobStatusResponse[]>({
-    queryKey: ["jobs", page, limit],
+    queryKey: ["jobs", page, limit, statusFilter],
     queryFn: async () => {
       const { data } = await api.get<JobStatusResponse[]>("/jobs", {
-        params: { limit, offset: page * limit },
+        params: {
+          limit,
+          offset: page * limit,
+          status: statusFilter === "all" ? undefined : statusFilter,
+        },
       });
       return data.sort((a, b) => b.job_id - a.job_id);
     },
@@ -137,7 +141,7 @@ export default function JobsPage() {
     );
     const failedCount = results.filter((r) => r.status === "rejected").length;
     setSelected(new Set());
-    await queryClient.invalidateQueries({ queryKey: ["jobs", page, limit] });
+    await queryClient.invalidateQueries({ queryKey: ["jobs", page, limit, statusFilter] });
     await queryClient.invalidateQueries({ queryKey: ["job-stats"] });
     setRetrying(false);
     setFeedback({
@@ -161,7 +165,7 @@ export default function JobsPage() {
         )}
       </div>
 
-      {jobs.length > 0 && (
+      {stats.total > 0 && (
         <div className="jobs-toolbar-row">
           {pills.map((pill) => {
             const active = statusFilter === pill.value;
@@ -244,7 +248,7 @@ export default function JobsPage() {
         <div className="jobs-empty-state">
           <i className="pi pi-inbox jobs-empty-icon" />
           <span className="jobs-empty-text">
-            {jobs.length === 0
+            {stats.total === 0
               ? "No jobs yet. Start a download from the search page."
               : "No jobs match the selected filter."}
           </span>

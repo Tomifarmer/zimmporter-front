@@ -125,6 +125,32 @@ describe("JobsPage", () => {
     });
   });
 
+  it("sends the selected status filter to the /jobs request", async () => {
+    const user = userEvent.setup();
+    mockApiGet([
+      buildJob({ job_id: 3, status: "failed", error: "boom" }),
+      buildJob({ job_id: 2, status: "success", songs: [] }),
+    ]);
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText("Job #3")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText("Failed"));
+
+    await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledWith(
+        "/jobs",
+        expect.objectContaining({
+          params: expect.objectContaining({ status: "failed", offset: 0 }),
+        }),
+      );
+    });
+  });
+
   it("shows empty state when no jobs exist", async () => {
     mockApiGet([]);
 
