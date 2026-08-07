@@ -198,7 +198,9 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
                   <td className="jd-table-td--status">
                     <StatusBadge status={song.status} />
                   </td>
-                  <td className="jd-table-td--error d-lg-table-cell">{song.error || "\u2014"}</td>
+                  <td className="jd-table-td--error d-lg-table-cell">
+                    {song.status === "failed" ? song.error || "\u2014" : "\u2014"}
+                  </td>
                 </tr>
               ))}
               {data.songs.length === 0 && (
