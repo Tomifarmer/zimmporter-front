@@ -135,7 +135,7 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
         </div>
       )}
 
-      {data.error && (
+      {isFailed && data.error && (
         <div className="jd-error-box">
           <span className="jd-error-label">Error: </span>
           {data.error}
