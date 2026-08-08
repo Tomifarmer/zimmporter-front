@@ -27,7 +27,11 @@ export default function LoginClient({ providers }: { providers: ProviderInfo[] }
               className="btn btn-outline-light btn-lg px-4 d-inline-flex align-items-center gap-2 w-100"
               onClick={() => signIn(p.id, { redirectTo: callbackUrl })}
             >
-              <i className={`pi ${p.icon}`} />
+              {p.icon.startsWith("/") ? (
+                <img src={p.icon} alt="" width="20" height="20" className="d-inline-block" />
+              ) : (
+                <i className={`pi ${p.icon}`} />
+              )}
               Sign in with {p.name}
             </button>
           </div>
