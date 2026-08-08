@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    groups:
+      patch-updates:
+        update-types:
+          - "patch"
 
   - package-ecosystem: "docker"
     directory: "/"
@@ -15,3 +19,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      patch-updates:
+        update-types:
+          - "patch"
