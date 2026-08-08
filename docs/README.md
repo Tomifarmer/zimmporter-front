@@ -96,7 +96,7 @@ Set in `.env.local` for local development, or via container environment at runti
 
 - Job metadata: type, current album, album progress, songs count
 - Progress bar (color reflects status: blue=running, green=success, red=failed)
-- Message and error display
+- Message and error display (the error box is shown only when the job is `failed`, so retried jobs never display a stale error)
 - Songs table with track number, title, artist, status, s3 path, error
 - Auto-polls `GET /jobs/{id}` every 3s while status is `pending` or `running`
 - Stops polling on `success` or `failed`
