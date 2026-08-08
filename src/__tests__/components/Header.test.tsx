@@ -187,6 +187,61 @@ describe("Header auth section", () => {
     expect(screen.getByText("Logout")).toBeInTheDocument();
   });
 
+  it("shows user group chips in the dropdown when the session has groups", async () => {
+    vi.mocked(getRuntimeConfig).mockReturnValue({
+      apiUrl: "http://localhost:8000",
+      apiKey: "",
+      useSocialLogin: true,
+      useSimpleAuth: false,
+    });
+    global.fetch = createFetchMock();
+
+    render(
+      <SessionProvider
+        session={{
+          user: { name: "Test User", email: "test@example.com", groups: ["IBR", "SEB"] },
+          accessToken: "tok",
+          expires: "2099-01-01T00:00:00.000Z",
+        }}
+      >
+        <Header useSocialLogin />
+      </SessionProvider>,
+    );
+
+    const user = userEvent.setup();
+    await user.click(screen.getByText("T"));
+
+    expect(screen.getByText("IBR")).toBeInTheDocument();
+    expect(screen.getByText("SEB")).toBeInTheDocument();
+  });
+
+  it("does not show group chips when the session has no groups", async () => {
+    vi.mocked(getRuntimeConfig).mockReturnValue({
+      apiUrl: "http://localhost:8000",
+      apiKey: "",
+      useSocialLogin: true,
+      useSimpleAuth: false,
+    });
+    global.fetch = createFetchMock();
+
+    render(
+      <SessionProvider
+        session={{
+          user: { name: "Test User", email: "test@example.com" },
+          accessToken: "tok",
+          expires: "2099-01-01T00:00:00.000Z",
+        }}
+      >
+        <Header useSocialLogin />
+      </SessionProvider>,
+    );
+
+    const user = userEvent.setup();
+    await user.click(screen.getByText("T"));
+
+    expect(screen.queryByText("IBR")).not.toBeInTheDocument();
+  });
+
   it("shows user avatar when session has an image", async () => {
     vi.mocked(getRuntimeConfig).mockReturnValue({
       apiUrl: "http://localhost:8000",

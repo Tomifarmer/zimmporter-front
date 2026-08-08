@@ -1,9 +1,9 @@
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 
 const AUTH_SECRET = process.env.AUTH_SECRET ?? "dev-secret-change-in-production";
 
-export const { handlers, auth, signIn, signOut } = NextAuth(() => {
+export function authConfig(): NextAuthConfig {
   const enabled = process.env.USE_SOCIAL_LOGIN === "true";
 
   if (!enabled) {
@@ -41,6 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => {
                   name: profile.name,
                   email: profile.email,
                   image: profile.picture,
+                  groups: profile.groups,
                 };
               },
             },
@@ -59,6 +60,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => {
         if (user?.image) {
           token.picture = user.image;
         }
+        if (user && Array.isArray(user.groups)) {
+          token.groups = user.groups;
+        }
         return token;
       },
       async session({ session, token }) {
@@ -68,8 +72,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => {
         if (token.picture) {
           session.user = { ...session.user, image: token.picture as string };
         }
+        if (Array.isArray(token.groups)) {
+          session.user = { ...session.user, groups: token.groups as string[] };
+        }
         return session;
       },
     },
   };
-});
+}
+
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);

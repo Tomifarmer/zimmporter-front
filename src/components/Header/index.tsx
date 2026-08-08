@@ -72,7 +72,20 @@ function AuthSection() {
               className="px-3 py-2 text-light small border-bottom"
               style={{ borderColor: "#334155" }}
             >
-              {session.user.name ?? session.user.email}
+              <div className="fw-semibold">{session.user.name ?? session.user.email}</div>
+              {session.user.groups && session.user.groups.length > 0 && (
+                <div className="d-flex flex-wrap gap-1 mt-1">
+                  {session.user.groups.map((group) => (
+                    <span
+                      key={group}
+                      className="badge rounded-pill text-uppercase"
+                      style={{ backgroundColor: "#334155", color: "#e2e8f0", fontWeight: 600 }}
+                    >
+                      {group}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <button
               type="button"
