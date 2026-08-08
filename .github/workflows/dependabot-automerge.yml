@@ -1,0 +1,24 @@
+name: Dependabot auto-merge
+
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dependabot/fetch-metadata@v3
+        id: metadata
+
+      - name: Enable auto-merge for patch updates
+        if: >-
+          ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
+              contains(github.event.pull_request.head.ref, 'patch-updates') }}
+        run: gh pr merge --auto --squash --delete-branch "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
