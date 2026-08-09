@@ -46,6 +46,22 @@ export function clearSocialLoginError() {
   _socialLoginError = false;
 }
 
+let _authTokenInvalid = false;
+let _onAuthTokenInvalid: (() => void) | null = null;
+
+export function hasAuthTokenInvalid() {
+  return _authTokenInvalid;
+}
+
+export function onAuthTokenInvalid(cb: () => void) {
+  _onAuthTokenInvalid = cb;
+  if (_authTokenInvalid) cb();
+}
+
+export function clearAuthTokenInvalid() {
+  _authTokenInvalid = false;
+}
+
 api.interceptors.request.use((config) => {
   const { apiKey, useSimpleAuth } = getRuntimeConfig();
   if (useSimpleAuth && apiKey) {
@@ -77,14 +93,20 @@ api.interceptors.response.use(
           );
         }
       }
-      if (
-        msg.includes("authentication token") &&
-        !_accessToken &&
-        !getRuntimeConfig().useSocialLogin
-      ) {
-        _socialLoginError = true;
-        _onSocialLoginError?.();
-        return Promise.reject(new Error("Authentication required. Please sign in."));
+      if (msg.includes("authentication token")) {
+        if (getRuntimeConfig().useSocialLogin) {
+          if (!_authTokenInvalid) {
+            _authTokenInvalid = true;
+            _accessToken = undefined;
+            _onAuthTokenInvalid?.();
+          }
+          return Promise.reject(new Error("Session expired. Please sign in again."));
+        }
+        if (!_accessToken) {
+          _socialLoginError = true;
+          _onSocialLoginError?.();
+          return Promise.reject(new Error("Authentication required. Please sign in."));
+        }
       }
     }
     const message = error.response?.data?.detail || error.message || "Request failed";

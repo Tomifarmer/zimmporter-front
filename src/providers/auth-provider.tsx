@@ -1,8 +1,8 @@
 "use client";
 
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider, signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { setAccessToken } from "@/lib/api";
+import { clearAuthTokenInvalid, onAuthTokenInvalid, setAccessToken } from "@/lib/api";
 
 function AccessTokenSync() {
   const { data: session } = useSession();
@@ -10,6 +10,18 @@ function AccessTokenSync() {
   useEffect(() => {
     setAccessToken(session?.accessToken);
   }, [session]);
+
+  return null;
+}
+
+function AuthTokenInvalidRedirect() {
+  useEffect(() => {
+    onAuthTokenInvalid(() => {
+      clearAuthTokenInvalid();
+      setAccessToken(undefined);
+      signOut({ redirectTo: "/login" });
+    });
+  }, []);
 
   return null;
 }
@@ -28,6 +40,7 @@ export default function AuthProvider({
   return (
     <SessionProvider>
       <AccessTokenSync />
+      <AuthTokenInvalidRedirect />
       {children}
     </SessionProvider>
   );
