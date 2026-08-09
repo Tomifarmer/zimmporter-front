@@ -67,8 +67,11 @@ describe("api response interceptor", () => {
     };
   }
 
-  function unauthorizedResponse(detail: string) {
-    return { response: { status: 401, data: { detail } } };
+  function unauthorizedResponse(detail: string, headers?: Record<string, string>) {
+    return {
+      config: headers ? { headers } : undefined,
+      response: { status: 401, data: { detail } },
+    };
   }
 
   type ResponseInterceptorRejected = (error: unknown) => Promise<unknown>;
@@ -113,7 +116,9 @@ describe("api response interceptor", () => {
 
     const err = await runRejected(
       await responseHandler(mod),
-      unauthorizedResponse("Invalid or missing authentication token"),
+      unauthorizedResponse("Invalid or missing authentication token", {
+        Authorization: "Bearer expired-token",
+      }),
     );
 
     expect(err?.message).toBe("Session expired. Please sign in again.");
@@ -127,12 +132,30 @@ describe("api response interceptor", () => {
     const cb = vi.fn();
     mod.onAuthTokenInvalid(cb);
 
-    const error = unauthorizedResponse("Invalid or missing authentication token");
+    const error = unauthorizedResponse("Invalid or missing authentication token", {
+      Authorization: "Bearer expired-token",
+    });
     const handler = await responseHandler(mod);
     await runRejected(handler, error);
     await runRejected(handler, error);
 
     expect(cb).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not treat a token-less 401 as an expired session during app boot", async () => {
+    const mod = await getMod();
+    setRuntimeConfig({ useSocialLogin: true });
+    mod.setAccessToken(undefined);
+    const cb = vi.fn();
+    mod.onAuthTokenInvalid(cb);
+
+    await runRejected(
+      await responseHandler(mod),
+      unauthorizedResponse("Invalid or missing authentication token"),
+    );
+
+    expect(cb).not.toHaveBeenCalled();
+    expect(mod.hasAuthTokenInvalid()).toBe(false);
   });
 
   it("uses the social login error path when social login is disabled", async () => {

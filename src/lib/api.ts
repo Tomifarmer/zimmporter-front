@@ -95,12 +95,15 @@ api.interceptors.response.use(
       }
       if (msg.includes("authentication token")) {
         if (getRuntimeConfig().useSocialLogin) {
-          if (!_authTokenInvalid) {
-            _authTokenInvalid = true;
-            _accessToken = undefined;
-            _onAuthTokenInvalid?.();
+          const sentToken = error.config?.headers?.["Authorization"];
+          if (sentToken) {
+            if (!_authTokenInvalid) {
+              _authTokenInvalid = true;
+              _accessToken = undefined;
+              _onAuthTokenInvalid?.();
+            }
+            return Promise.reject(new Error("Session expired. Please sign in again."));
           }
-          return Promise.reject(new Error("Session expired. Please sign in again."));
         }
         if (!_accessToken) {
           _socialLoginError = true;
