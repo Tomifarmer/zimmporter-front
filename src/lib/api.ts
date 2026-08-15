@@ -95,7 +95,7 @@ api.interceptors.response.use(
       }
       if (msg.includes("authentication token")) {
         if (getRuntimeConfig().useSocialLogin) {
-          const sentToken = error.config?.headers?.["Authorization"];
+          const sentToken = error.config?.headers?.Authorization;
           if (sentToken) {
             if (!_authTokenInvalid) {
               _authTokenInvalid = true;
