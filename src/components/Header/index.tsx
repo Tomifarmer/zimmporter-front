@@ -9,6 +9,7 @@ import { getRuntimeConfig } from "@/lib/config";
 const navItems = [
   { label: "Search", href: "/search" },
   { label: "Jobs", href: "/jobs" },
+  { label: "Stats", href: "/stats" },
   { label: "Settings", href: "/settings" },
 ];
 

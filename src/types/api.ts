@@ -65,6 +65,33 @@ export interface JobStatsResponse {
   partial: number;
 }
 
+export interface GenreCount {
+  genre: string;
+  count: number;
+}
+
+export interface TopUserCount {
+  user: string;
+  jobs: number;
+  tracks: number;
+}
+
+export interface StatsResponse {
+  jobs: {
+    total: number;
+    by_status: Record<string, number>;
+    by_type: { album: number; playlist: number };
+  };
+  library: {
+    albums: number;
+    playlists: number;
+    artists: number;
+    tracks: number;
+  };
+  genres: GenreCount[];
+  top_users: TopUserCount[];
+}
+
 export interface CookieStatus {
   exists: boolean;
   size: number;

@@ -1,6 +1,14 @@
 import "@testing-library/jest-dom/vitest";
 import { mockApi } from "./helpers/api-mock";
 
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+globalThis.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
+
 const mockSetAccessToken = vi.fn();
 
 vi.mock("@/lib/api", () => ({
