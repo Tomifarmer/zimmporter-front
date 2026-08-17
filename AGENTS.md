@@ -1,7 +1,7 @@
 # Zimmporter Frontend — Agent Notes
 
 ## Stack
-Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Query, axios.
+Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Query, axios, recharts (stats charts).
 
 ## Commands
 | Command | Purpose |
@@ -21,11 +21,12 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 - **Mock factories:** `src/__tests__/helpers/factories.ts` provides builders for `SearchResult`, `JobStatusResponse`, `Song`
 - **Page tests** require a `QueryClient` wrapper — see existing page tests for pattern
 - **Dynamic imports** (e.g., `next/dynamic` for PrimeReact Dropdown) are mocked in page test files as needed
+- **Charts** — `src/__tests__/setup.ts` stubs `ResizeObserver` (recharts needs it under jsdom); the StatsPage test mocks recharts' `ResponsiveContainer` to inject fixed width/height
 
 ## Project Structure
 - `src/proxy.ts` — Next.js 16 proxy; redirects unauthenticated users to `/login` when `USE_SOCIAL_LOGIN=true`
 - `src/app/api/config/route.ts` — runtime config endpoint (reads `API_URL` and `API_KEY` from server env)
-- `src/app/` — App Router pages (`(app)/page.tsx`, `(app)/search/`, `(app)/jobs/`, `(app)/settings/`, `(auth)/login/`)
+- `src/app/` — App Router pages (`(app)/page.tsx`, `(app)/search/`, `(app)/jobs/`, `(app)/stats/`, `(app)/settings/`, `(auth)/login/`)
 - `src/components/ApiKeyErrorOverlay.tsx` — full-page overlay when backend requires API key but none configured
 - `src/components/SocialLoginErrorOverlay.tsx` — full-page overlay when backend requires auth but no session active
 - `src/components/AuthConflictOverlay.tsx` — full-page overlay when both `USE_SOCIAL_LOGIN` and `USE_SIMPLE_AUTH` are enabled
@@ -34,6 +35,7 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 - `src/lib/auth.ts` — NextAuth v5 config; OIDC/GitHub providers, JWT/session image passthrough
 - `src/lib/config.ts` — `RuntimeConfig` type with `useSocialLogin`, `useSimpleAuth`, `apiUrl`, `apiKey`
 - `src/hooks/useJobPolling.ts` — polls job status every 3s while pending/running
+- `src/app/(app)/stats/` — Stats tab; fetches `GET /stats` (job aggregates, library size, genre distribution, top social-login users) with React Query and renders recharts donut/bar charts
 - `src/providers/auth-provider.tsx` — wraps children in `SessionProvider` when `useSocialLogin` prop is true
 - `src/providers/query-provider.tsx` — React Query wrapper (all pages are inside it)
 - `src/types/api.ts` — shared TypeScript types for API responses (`SearchResult.available` flags albums already in the library)

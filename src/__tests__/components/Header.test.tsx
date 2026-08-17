@@ -58,6 +58,7 @@ describe("Header", () => {
     renderHeader();
     expect(screen.getByText("Search")).toBeInTheDocument();
     expect(screen.getByText("Jobs")).toBeInTheDocument();
+    expect(screen.getByText("Stats")).toBeInTheDocument();
   });
 
   it("marks the current page nav link as active", () => {
