@@ -21,4 +21,16 @@ describe("StatusBadge", () => {
       unmount();
     }
   });
+
+  it("shows a hover hint for unavailable status", () => {
+    const { container } = render(<StatusBadge status="unavailable" />);
+    const span = container.firstChild as HTMLElement;
+    expect(span.title).toContain("no video on YouTube Music");
+  });
+
+  it("does not set a hover hint for other statuses", () => {
+    const { container } = render(<StatusBadge status="failed" />);
+    const span = container.firstChild as HTMLElement;
+    expect(span.title).toBe("");
+  });
 });

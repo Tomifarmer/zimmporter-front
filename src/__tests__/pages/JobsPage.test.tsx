@@ -258,6 +258,21 @@ describe("JobsPage retry selection", () => {
     });
   });
 
+  it("shows a checkbox for a failed job with no songs", async () => {
+    mockApiGet([
+      buildJob({ job_id: 1, status: "failed", error: "boom", total_songs: 0, songs: [] }),
+      buildJob({ job_id: 2, status: "success", songs: [] }),
+    ]);
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getAllByRole("checkbox")).toHaveLength(1);
+    });
+    expect(screen.getByText("Retry selected (0)")).toBeDisabled();
+  });
+
   it("retry button is disabled when nothing is selected", async () => {
     mockApiGet([retryableJob(1)]);
 

@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
-import { clearApiMocks, mockApiGet } from "@/__tests__/helpers/api-mock";
+import { clearApiMocks, mockApi, mockApiGet } from "@/__tests__/helpers/api-mock";
 import { buildJob, buildSong } from "@/__tests__/helpers/factories";
 
 function createWrapper() {
@@ -103,5 +103,72 @@ describe("JobDetailPage error column", () => {
       expect(screen.getByText("Job #4")).toBeInTheDocument();
     });
     expect(screen.getByText(/Job stalled — worker likely crashed/i)).toBeInTheDocument();
+  });
+});
+
+describe("JobDetailPage retry", () => {
+  beforeEach(() => {
+    clearApiMocks();
+  });
+
+  it("shows a retry button for a failed job with no failed songs", async () => {
+    await renderDetail(
+      buildJob({
+        job_id: 10,
+        status: "failed",
+        error: "Aborted before songs were inserted",
+        total_songs: 0,
+        songs_downloaded: 0,
+        songs: [],
+      }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Job #10")).toBeInTheDocument();
+    });
+    expect(screen.getByRole("button", { name: /Retry job/ })).toBeInTheDocument();
+  });
+
+  it("hides the retry button for a successful job", async () => {
+    await renderDetail(
+      buildJob({
+        job_id: 11,
+        status: "success",
+        total_songs: 1,
+        songs_downloaded: 1,
+        songs: [buildSong({ id: 1, status: "success" })],
+      }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Job #11")).toBeInTheDocument();
+    });
+    expect(screen.queryByRole("button", { name: /Retry/ })).not.toBeInTheDocument();
+  });
+
+  it("posts to /jobs/{id}/retry when the retry button is clicked", async () => {
+    mockApi.post.mockResolvedValue({ data: { job_id: 12, status: "running" } });
+    await renderDetail(
+      buildJob({
+        job_id: 12,
+        status: "failed",
+        error: "boom",
+        total_songs: 0,
+        songs_downloaded: 0,
+        songs: [],
+      }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Retry job/ })).toBeInTheDocument();
+    });
+
+    const { default: userEvent } = await import("@testing-library/user-event");
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: /Retry job/ }));
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith("/jobs/12/retry");
+    });
   });
 });

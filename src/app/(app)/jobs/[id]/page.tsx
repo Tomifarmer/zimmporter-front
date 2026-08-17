@@ -142,7 +142,7 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
         </div>
       )}
 
-      {failedCount > 0 && !isRunning && (
+      {(isFailed || failedCount > 0) && !isRunning && (
         <div className="jd-retry-wrapper">
           <button
             type="button"
@@ -165,7 +165,9 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
             ) : (
               <>
                 <i className="pi pi-refresh jd-refresh-icon" />
-                Retry {failedCount} failed song{failedCount > 1 ? "s" : ""}
+                {failedCount > 0
+                  ? `Retry ${failedCount} failed song${failedCount > 1 ? "s" : ""}`
+                  : "Retry job"}
               </>
             )}
           </button>

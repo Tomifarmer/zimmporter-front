@@ -12,7 +12,7 @@ function isPartial(job: JobStatusResponse): boolean {
 }
 
 function isRetryable(job: JobStatusResponse): boolean {
-  return job.songs.some((s) => s.status === "failed");
+  return job.status === "failed" || job.songs.some((s) => s.status === "failed");
 }
 
 type StatusFilter = "all" | "pending" | "running" | "success" | "failed" | "partial";
