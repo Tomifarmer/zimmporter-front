@@ -351,11 +351,6 @@ describe("JobsPage retry selection", () => {
 describe("JobsPage delete", () => {
   beforeEach(() => {
     clearApiMocks();
-    vi.spyOn(window, "confirm").mockReturnValue(true);
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   const deletableJob = (id: number) => buildJob({ job_id: id, can_delete: true, songs: [] });
@@ -374,9 +369,8 @@ describe("JobsPage delete", () => {
     expect(screen.getAllByTitle("Delete job")).toHaveLength(1);
   });
 
-  it("deletes a job after confirmation and shows feedback", async () => {
+  it("opens a PrimeReact confirmation dialog before deleting", async () => {
     mockApiGet([deletableJob(5)]);
-    mockApi.delete.mockResolvedValue({ data: { job_id: 5, status: "deleted" } });
     const user = userEvent.setup();
 
     const JobsPage = await importJobsPage();
@@ -388,15 +382,33 @@ describe("JobsPage delete", () => {
 
     await user.click(screen.getByTitle("Delete job"));
 
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent("Delete job #5? This cannot be undone.");
+    expect(mockApi.delete).not.toHaveBeenCalled();
+  });
+
+  it("deletes a job after confirming in the dialog", async () => {
+    mockApiGet([deletableJob(5)]);
+    mockApi.delete.mockResolvedValue({ data: { job_id: 5, status: "deleted" } });
+    const user = userEvent.setup();
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByTitle("Delete job")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByTitle("Delete job"));
+    await user.click(await screen.findByRole("button", { name: "Delete" }));
+
     await waitFor(() => {
       expect(mockApi.delete).toHaveBeenCalledWith("/jobs/5");
-      expect(window.confirm).toHaveBeenCalledWith("Delete job #5? This cannot be undone.");
-      expect(screen.getByText("Deleted job #5.")).toBeInTheDocument();
+      expect(screen.getByText("Deleted 1 job(s).")).toBeInTheDocument();
     });
   });
 
-  it("does not delete when confirmation is dismissed", async () => {
-    vi.spyOn(window, "confirm").mockReturnValue(false);
+  it("does not delete when the dialog is cancelled", async () => {
     mockApiGet([deletableJob(6)]);
     const user = userEvent.setup();
 
@@ -404,15 +416,16 @@ describe("JobsPage delete", () => {
     render(<JobsPage />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText("Job #6")).toBeInTheDocument();
+      expect(screen.getByTitle("Delete job")).toBeInTheDocument();
     });
 
     await user.click(screen.getByTitle("Delete job"));
+    await user.click(await screen.findByRole("button", { name: "Cancel" }));
 
     expect(mockApi.delete).not.toHaveBeenCalled();
   });
 
-  it("selects and bulk-deletes deletable jobs", async () => {
+  it("selects and bulk-deletes deletable jobs via the dialog", async () => {
     mockApiGet([deletableJob(1), deletableJob(2)]);
     mockApi.delete.mockResolvedValue({ data: { job_id: 1, status: "deleted" } });
     const user = userEvent.setup();
@@ -426,6 +439,11 @@ describe("JobsPage delete", () => {
 
     await user.click(screen.getByText("Select all"));
     await user.click(screen.getByText("Delete selected (2)"));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent("Delete 2 selected job(s)? This cannot be undone.");
+
+    await user.click(screen.getByRole("button", { name: "Delete" }));
 
     await waitFor(() => {
       expect(mockApi.delete).toHaveBeenCalledWith("/jobs/1");
@@ -443,13 +461,14 @@ describe("JobsPage delete", () => {
     render(<JobsPage />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText("Job #9")).toBeInTheDocument();
+      expect(screen.getByTitle("Delete job")).toBeInTheDocument();
     });
 
     await user.click(screen.getByTitle("Delete job"));
+    await user.click(await screen.findByRole("button", { name: "Delete" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Failed to delete job #9.")).toBeInTheDocument();
+      expect(screen.getByText("0 job(s) deleted, 1 failed.")).toBeInTheDocument();
     });
   });
 });

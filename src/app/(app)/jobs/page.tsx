@@ -2,6 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import JobRow from "@/components/JobRow";
 import { COLORS } from "@/config/colors";
 import { api } from "@/lib/api";
@@ -30,6 +31,8 @@ export default function JobsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState<"retry" | "delete" | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<number[] | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [feedback, setFeedback] = useState<{ text: string; isError: boolean } | null>(null);
   const queryClient = useQueryClient();
   const limit = 20;
@@ -173,44 +176,40 @@ export default function JobsPage() {
     });
   };
 
-  const deleteJob = async (jobId: number) => {
-    if (busy || !window.confirm(`Delete job #${jobId}? This cannot be undone.`)) return;
-    setBusy("delete");
+  const requestDeleteJob = (jobId: number) => {
+    if (busy) return;
     setFeedback(null);
-    try {
-      await api.delete(`/jobs/${jobId}`);
-      setSelected((prev) => {
-        const next = new Set(prev);
-        next.delete(jobId);
-        return next;
-      });
-      await refreshJobs();
-      setFeedback({ text: `Deleted job #${jobId}.`, isError: false });
-    } catch {
-      setFeedback({ text: `Failed to delete job #${jobId}.`, isError: true });
-    } finally {
-      setBusy(null);
-    }
+    setDeleteTarget([jobId]);
   };
 
-  const deleteSelected = async () => {
+  const requestDeleteSelected = () => {
     const ids = [...selected].filter((id) => deletableIds.includes(id));
     if (ids.length === 0 || busy) return;
-    if (!window.confirm(`Delete ${ids.length} job(s)? This cannot be undone.`)) return;
-    setBusy("delete");
     setFeedback(null);
-    const results = await Promise.allSettled(ids.map((id) => api.delete(`/jobs/${id}`)));
-    const failedCount = results.filter((r) => r.status === "rejected").length;
-    setSelected(new Set());
-    await refreshJobs();
-    setBusy(null);
-    setFeedback({
-      text:
-        failedCount === 0
-          ? `Deleted ${ids.length} job(s).`
-          : `${ids.length - failedCount} job(s) deleted, ${failedCount} failed.`,
-      isError: failedCount > 0,
-    });
+    setDeleteTarget(ids);
+  };
+
+  const confirmDelete = async () => {
+    const ids = deleteTarget;
+    if (!ids || ids.length === 0 || deleting) return;
+    setDeleting(true);
+    setFeedback(null);
+    try {
+      const results = await Promise.allSettled(ids.map((id) => api.delete(`/jobs/${id}`)));
+      const failedCount = results.filter((r) => r.status === "rejected").length;
+      setSelected((prev) => new Set([...prev].filter((id) => !ids.includes(id))));
+      await refreshJobs();
+      setFeedback({
+        text:
+          failedCount === 0
+            ? `Deleted ${ids.length} job(s).`
+            : `${ids.length - failedCount} job(s) deleted, ${failedCount} failed.`,
+        isError: failedCount > 0,
+      });
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
   };
 
   return (
@@ -287,13 +286,11 @@ export default function JobsPage() {
           {deletableIds.length > 0 && (
             <button
               type="button"
-              onClick={deleteSelected}
-              disabled={selectedDeleteCount === 0 || busy !== null}
+              onClick={requestDeleteSelected}
+              disabled={selectedDeleteCount === 0 || busy !== null || deleting}
               className="jobs-toolbar-delete-btn"
             >
-              {busy === "delete" && selectedDeleteCount > 1
-                ? "Deleting\u2026"
-                : `Delete selected (${selectedDeleteCount})`}
+              Delete selected ({selectedDeleteCount})
             </button>
           )}
         </div>
@@ -336,7 +333,7 @@ export default function JobsPage() {
                 selectable={isRetryable(job) || Boolean(job.can_delete)}
                 checked={selected.has(job.job_id)}
                 onToggleSelect={() => toggleSelect(job.job_id)}
-                onDelete={job.can_delete ? () => deleteJob(job.job_id) : undefined}
+                onDelete={job.can_delete ? () => requestDeleteJob(job.job_id) : undefined}
               />
             </div>
           ))}
@@ -380,6 +377,25 @@ export default function JobsPage() {
           </button>
         </div>
       )}
+
+      <ConfirmDeleteDialog
+        visible={deleteTarget !== null}
+        title={deleteTarget && deleteTarget.length > 1 ? "Delete jobs" : "Delete job"}
+        message={
+          deleteTarget
+            ? `Delete ${
+                deleteTarget.length > 1
+                  ? `${deleteTarget.length} selected job(s)`
+                  : `job #${deleteTarget[0]}`
+              }? This cannot be undone.`
+            : ""
+        }
+        pending={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          if (!deleting) setDeleteTarget(null);
+        }}
+      />
     </div>
   );
 }

@@ -1,0 +1,21 @@
+.confirm-delete-dialog-body {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+}
+
+.confirm-delete-dialog-icon {
+  color: #f59e0b;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.confirm-delete-dialog .p-dialog-header {
+  padding-bottom: 0.5rem;
+}
+
+.confirm-delete-dialog .p-dialog-footer {
+  padding-top: 0.5rem;
+}

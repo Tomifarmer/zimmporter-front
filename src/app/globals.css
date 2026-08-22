@@ -8,6 +8,7 @@
 @import "@/components/Header/Header.css";
 @import "@/components/StatusBadge/StatusBadge.css";
 @import "@/components/JobRow/JobRow.css";
+@import "@/components/ConfirmDeleteDialog/ConfirmDeleteDialog.css";
 @import "@/components/Lightfall/Lightfall.css";
 @import "@/app/not-found.css";
 @import "@/app/(app)/jobs/JobsPage.css";
