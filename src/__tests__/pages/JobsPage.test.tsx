@@ -347,3 +347,128 @@ describe("JobsPage retry selection", () => {
     });
   });
 });
+
+describe("JobsPage delete", () => {
+  beforeEach(() => {
+    clearApiMocks();
+  });
+
+  const deletableJob = (id: number) => buildJob({ job_id: id, can_delete: true, songs: [] });
+
+  it("shows a per-row delete button only for deletable jobs", async () => {
+    mockApiGet([deletableJob(1), buildJob({ job_id: 2, can_delete: false, songs: [] })]);
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText("Job #1")).toBeInTheDocument();
+      expect(screen.getByText("Job #2")).toBeInTheDocument();
+    });
+    expect(screen.getByTitle("Delete job")).toBeInTheDocument();
+    expect(screen.getAllByTitle("Delete job")).toHaveLength(1);
+  });
+
+  it("opens a PrimeReact confirmation dialog before deleting", async () => {
+    mockApiGet([deletableJob(5)]);
+    const user = userEvent.setup();
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText("Job #5")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByTitle("Delete job"));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent("Delete job #5? This cannot be undone.");
+    expect(mockApi.delete).not.toHaveBeenCalled();
+  });
+
+  it("deletes a job after confirming in the dialog", async () => {
+    mockApiGet([deletableJob(5)]);
+    mockApi.delete.mockResolvedValue({ data: { job_id: 5, status: "deleted" } });
+    const user = userEvent.setup();
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByTitle("Delete job")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByTitle("Delete job"));
+    await user.click(await screen.findByRole("button", { name: "Delete" }));
+
+    await waitFor(() => {
+      expect(mockApi.delete).toHaveBeenCalledWith("/jobs/5");
+      expect(screen.getByText("Deleted 1 job(s).")).toBeInTheDocument();
+    });
+  });
+
+  it("does not delete when the dialog is cancelled", async () => {
+    mockApiGet([deletableJob(6)]);
+    const user = userEvent.setup();
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByTitle("Delete job")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByTitle("Delete job"));
+    await user.click(await screen.findByRole("button", { name: "Cancel" }));
+
+    expect(mockApi.delete).not.toHaveBeenCalled();
+  });
+
+  it("selects and bulk-deletes deletable jobs via the dialog", async () => {
+    mockApiGet([deletableJob(1), deletableJob(2)]);
+    mockApi.delete.mockResolvedValue({ data: { job_id: 1, status: "deleted" } });
+    const user = userEvent.setup();
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getAllByRole("checkbox")).toHaveLength(2);
+    });
+
+    await user.click(screen.getByText("Select all"));
+    await user.click(screen.getByText("Delete selected (2)"));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent("Delete 2 selected job(s)? This cannot be undone.");
+
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+
+    await waitFor(() => {
+      expect(mockApi.delete).toHaveBeenCalledWith("/jobs/1");
+      expect(mockApi.delete).toHaveBeenCalledWith("/jobs/2");
+      expect(screen.getByText("Deleted 2 job(s).")).toBeInTheDocument();
+    });
+  });
+
+  it("shows error feedback when a delete fails", async () => {
+    mockApiGet([deletableJob(9)]);
+    mockApi.delete.mockRejectedValue(new Error("forbidden"));
+    const user = userEvent.setup();
+
+    const JobsPage = await importJobsPage();
+    render(<JobsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByTitle("Delete job")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByTitle("Delete job"));
+    await user.click(await screen.findByRole("button", { name: "Delete" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("0 job(s) deleted, 1 failed.")).toBeInTheDocument();
+    });
+  });
+});

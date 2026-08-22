@@ -1,7 +1,9 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import StatusBadge from "@/components/StatusBadge";
 import { COLORS } from "@/config/colors";
 import { useJobPolling } from "@/hooks/useJobPolling";
@@ -15,6 +17,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string }> }) {
   const [resolved, setResolved] = useState(false);
   const [jobId, setJobId] = useState<number | undefined>();
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -31,6 +34,7 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
 
   const { data, isLoading, isError, error } = useJobPolling(jobId);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const retryMutation = useMutation({
     mutationFn: async () => {
@@ -40,6 +44,18 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["job", jobId] });
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await api.delete(`/jobs/${jobId}`);
+    },
+    onSuccess: () => {
+      setConfirmDelete(false);
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      queryClient.invalidateQueries({ queryKey: ["job-stats"] });
+      router.push("/jobs");
     },
   });
 
@@ -89,6 +105,24 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
       <div className="jd-title-row">
         <h1 className="jd-title">Job #{data.job_id}</h1>
         <StatusBadge status={displayStatus} />
+        {data.can_delete && (
+          <button
+            type="button"
+            onClick={() => setConfirmDelete(true)}
+            disabled={deleteMutation.isPending}
+            className="jd-delete-btn"
+            style={
+              {
+                "--delete-bg": deleteMutation.isPending ? "#1e293b" : "transparent",
+                "--delete-cursor": deleteMutation.isPending ? "not-allowed" : "pointer",
+                "--delete-opacity": deleteMutation.isPending ? 0.5 : 1,
+              } as React.CSSProperties
+            }
+          >
+            <i className="pi pi-trash jd-trash-icon" />
+            Delete
+          </button>
+        )}
         {isRunning && (
           <span className="jd-polling-indicator">
             <span className="jd-polling-dot animate-pulse-fill" />
@@ -96,6 +130,19 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
           </span>
         )}
       </div>
+
+      {data.can_delete && (
+        <ConfirmDeleteDialog
+          visible={confirmDelete}
+          title="Delete job"
+          message={`Delete job #${data.job_id}? This cannot be undone.`}
+          pending={deleteMutation.isPending}
+          onConfirm={() => deleteMutation.mutate()}
+          onCancel={() => {
+            if (!deleteMutation.isPending) setConfirmDelete(false);
+          }}
+        />
+      )}
 
       <div className="row g-3 jd-info-cards-row">
         <div className="col-12 col-sm-6">

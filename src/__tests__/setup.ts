@@ -15,6 +15,7 @@ vi.mock("@/lib/api", () => ({
   api: {
     get: mockApi.get,
     post: mockApi.post,
+    delete: mockApi.delete,
     defaults: {
       headers: { common: {} },
     },

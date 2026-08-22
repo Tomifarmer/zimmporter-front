@@ -2,6 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import JobRow from "@/components/JobRow";
 import { COLORS } from "@/config/colors";
 import { api } from "@/lib/api";
@@ -29,7 +30,9 @@ export default function JobsPage() {
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [retrying, setRetrying] = useState(false);
+  const [busy, setBusy] = useState<"retry" | "delete" | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<number[] | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [feedback, setFeedback] = useState<{ text: string; isError: boolean } | null>(null);
   const queryClient = useQueryClient();
   const limit = 20;
@@ -98,8 +101,25 @@ export default function JobsPage() {
     () => filteredJobs.filter(isRetryable).map((j) => j.job_id),
     [filteredJobs],
   );
+  const deletableIds = useMemo(
+    () => filteredJobs.filter((j) => j.can_delete).map((j) => j.job_id),
+    [filteredJobs],
+  );
+  const selectableIds = useMemo(
+    () => [...new Set([...retryableIds, ...deletableIds])],
+    [retryableIds, deletableIds],
+  );
+  const selectedRetryCount = useMemo(
+    () => [...selected].filter((id) => retryableIds.includes(id)).length,
+    [selected, retryableIds],
+  );
+  const selectedDeleteCount = useMemo(
+    () => [...selected].filter((id) => deletableIds.includes(id)).length,
+    [selected, deletableIds],
+  );
 
-  const allSelectedOnPage = retryableIds.length > 0 && retryableIds.every((id) => selected.has(id));
+  const allSelectedOnPage =
+    selectableIds.length > 0 && selectableIds.every((id) => selected.has(id));
 
   const toggleSelect = (jobId: number) => {
     setFeedback(null);
@@ -116,11 +136,11 @@ export default function JobsPage() {
     setSelected((prev) => {
       const next = new Set(prev);
       if (allSelectedOnPage)
-        retryableIds.forEach((id) => {
+        selectableIds.forEach((id) => {
           next.delete(id);
         });
       else
-        retryableIds.forEach((id) => {
+        selectableIds.forEach((id) => {
           next.add(id);
         });
       return next;
@@ -132,25 +152,64 @@ export default function JobsPage() {
     setSelected(new Set());
   };
 
-  const retrySelected = async () => {
-    if (selected.size === 0 || retrying) return;
-    setRetrying(true);
-    setFeedback(null);
-    const results = await Promise.allSettled(
-      [...selected].map((id) => api.post(`/jobs/${id}/retry`)),
-    );
-    const failedCount = results.filter((r) => r.status === "rejected").length;
-    setSelected(new Set());
+  const refreshJobs = async () => {
     await queryClient.invalidateQueries({ queryKey: ["jobs", page, limit, statusFilter] });
     await queryClient.invalidateQueries({ queryKey: ["job-stats"] });
-    setRetrying(false);
+  };
+
+  const retrySelected = async () => {
+    const ids = [...selected].filter((id) => retryableIds.includes(id));
+    if (ids.length === 0 || busy) return;
+    setBusy("retry");
+    setFeedback(null);
+    const results = await Promise.allSettled(ids.map((id) => api.post(`/jobs/${id}/retry`)));
+    const failedCount = results.filter((r) => r.status === "rejected").length;
+    setSelected(new Set());
+    await refreshJobs();
+    setBusy(null);
     setFeedback({
       text:
         failedCount === 0
-          ? `Retried ${results.length} job(s).`
-          : `${results.length - failedCount} job(s) retried, ${failedCount} failed.`,
+          ? `Retried ${ids.length} job(s).`
+          : `${ids.length - failedCount} job(s) retried, ${failedCount} failed.`,
       isError: failedCount > 0,
     });
+  };
+
+  const requestDeleteJob = (jobId: number) => {
+    if (busy) return;
+    setFeedback(null);
+    setDeleteTarget([jobId]);
+  };
+
+  const requestDeleteSelected = () => {
+    const ids = [...selected].filter((id) => deletableIds.includes(id));
+    if (ids.length === 0 || busy) return;
+    setFeedback(null);
+    setDeleteTarget(ids);
+  };
+
+  const confirmDelete = async () => {
+    const ids = deleteTarget;
+    if (!ids || ids.length === 0 || deleting) return;
+    setDeleting(true);
+    setFeedback(null);
+    try {
+      const results = await Promise.allSettled(ids.map((id) => api.delete(`/jobs/${id}`)));
+      const failedCount = results.filter((r) => r.status === "rejected").length;
+      setSelected((prev) => new Set([...prev].filter((id) => !ids.includes(id))));
+      await refreshJobs();
+      setFeedback({
+        text:
+          failedCount === 0
+            ? `Deleted ${ids.length} job(s).`
+            : `${ids.length - failedCount} job(s) deleted, ${failedCount} failed.`,
+        isError: failedCount > 0,
+      });
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
   };
 
   return (
@@ -198,12 +257,12 @@ export default function JobsPage() {
         </div>
       )}
 
-      {jobs.length > 0 && retryableIds.length > 0 && (
+      {jobs.length > 0 && selectableIds.length > 0 && (
         <div className="jobs-select-toolbar-row">
           <button
             type="button"
             onClick={toggleSelectAllOnPage}
-            disabled={retrying}
+            disabled={busy !== null}
             className="jobs-select-btn"
           >
             {allSelectedOnPage ? "Deselect all" : "Select all"}
@@ -211,7 +270,7 @@ export default function JobsPage() {
           <button
             type="button"
             onClick={clearSelection}
-            disabled={retrying || selected.size === 0}
+            disabled={busy !== null || selected.size === 0}
             className="jobs-select-btn"
           >
             Clear
@@ -219,11 +278,21 @@ export default function JobsPage() {
           <button
             type="button"
             onClick={retrySelected}
-            disabled={selected.size === 0 || retrying}
+            disabled={selectedRetryCount === 0 || busy !== null}
             className="jobs-toolbar-retry-btn"
           >
-            {retrying ? "Retrying\u2026" : `Retry selected (${selected.size})`}
+            {busy === "retry" ? "Retrying\u2026" : `Retry selected (${selectedRetryCount})`}
           </button>
+          {deletableIds.length > 0 && (
+            <button
+              type="button"
+              onClick={requestDeleteSelected}
+              disabled={selectedDeleteCount === 0 || busy !== null || deleting}
+              className="jobs-toolbar-delete-btn"
+            >
+              Delete selected ({selectedDeleteCount})
+            </button>
+          )}
         </div>
       )}
 
@@ -261,9 +330,10 @@ export default function JobsPage() {
             <div key={job.job_id} className="jobs-card-wrapper">
               <JobRow
                 job={job}
-                selectable={isRetryable(job)}
+                selectable={isRetryable(job) || Boolean(job.can_delete)}
                 checked={selected.has(job.job_id)}
                 onToggleSelect={() => toggleSelect(job.job_id)}
+                onDelete={job.can_delete ? () => requestDeleteJob(job.job_id) : undefined}
               />
             </div>
           ))}
@@ -307,6 +377,25 @@ export default function JobsPage() {
           </button>
         </div>
       )}
+
+      <ConfirmDeleteDialog
+        visible={deleteTarget !== null}
+        title={deleteTarget && deleteTarget.length > 1 ? "Delete jobs" : "Delete job"}
+        message={
+          deleteTarget
+            ? `Delete ${
+                deleteTarget.length > 1
+                  ? `${deleteTarget.length} selected job(s)`
+                  : `job #${deleteTarget[0]}`
+              }? This cannot be undone.`
+            : ""
+        }
+        pending={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          if (!deleting) setDeleteTarget(null);
+        }}
+      />
     </div>
   );
 }

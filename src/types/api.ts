@@ -51,6 +51,7 @@ export interface JobStatusResponse {
   album_name?: string;
   requested_by?: string;
   songs_downloaded: number;
+  can_delete?: boolean;
   songs: Song[];
   created_at: string;
   updated_at: string;

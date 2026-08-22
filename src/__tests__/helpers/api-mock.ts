@@ -3,6 +3,7 @@ import { vi } from "vitest";
 export const mockApi = {
   get: vi.fn(),
   post: vi.fn(),
+  delete: vi.fn(),
 };
 
 export function mockApiGet<T>(data: T) {
@@ -23,8 +24,13 @@ export function mockApiPost<T>(data: T) {
   mockApi.post.mockResolvedValue({ data });
 }
 
+export function mockApiDelete<T>(data: T) {
+  mockApi.delete.mockResolvedValue({ data });
+}
+
 export function clearApiMocks() {
   mockApi.get.mockReset();
   mockApi.post.mockReset();
+  mockApi.delete.mockReset();
   getRoutes.clear();
 }

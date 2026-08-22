@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { buildJob } from "@/__tests__/helpers/factories";
 import JobRow from "@/components/JobRow";
 
@@ -122,5 +123,23 @@ describe("JobRow", () => {
     render(<JobRow job={job} />);
     const link = screen.getByRole("link");
     expect(link).toHaveAttribute("href", "/jobs/7");
+  });
+
+  it("does not render a delete button without onDelete", () => {
+    const job = buildJob({ job_id: 7 });
+    render(<JobRow job={job} />);
+    expect(screen.queryByTitle("Delete job")).not.toBeInTheDocument();
+  });
+
+  it("renders a delete button when onDelete is provided and calls it on click", async () => {
+    const user = userEvent.setup();
+    const onDelete = vi.fn();
+    const job = buildJob({ job_id: 7, can_delete: true });
+    render(<JobRow job={job} onDelete={onDelete} />);
+
+    await user.click(screen.getByTitle("Delete job"));
+
+    expect(onDelete).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("link")).toHaveAttribute("href", "/jobs/7");
   });
 });

@@ -1,7 +1,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { clearApiMocks, mockApi, mockApiGet } from "@/__tests__/helpers/api-mock";
 import { buildJob, buildSong } from "@/__tests__/helpers/factories";
+
+const pushMock = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: pushMock }),
+}));
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -170,5 +177,83 @@ describe("JobDetailPage retry", () => {
     await waitFor(() => {
       expect(mockApi.post).toHaveBeenCalledWith("/jobs/12/retry");
     });
+  });
+});
+
+describe("JobDetailPage delete", () => {
+  beforeEach(() => {
+    clearApiMocks();
+    pushMock.mockClear();
+  });
+
+  it("shows the delete button when the job is deletable", async () => {
+    await renderDetail(buildJob({ job_id: 20, can_delete: true, songs: [] }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Job #20")).toBeInTheDocument();
+    });
+    expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+  });
+
+  it("hides the delete button when the job is not deletable", async () => {
+    await renderDetail(buildJob({ job_id: 21, can_delete: false, songs: [] }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Job #21")).toBeInTheDocument();
+    });
+    expect(screen.queryByRole("button", { name: "Delete" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("opens a PrimeReact confirmation dialog before deleting", async () => {
+    const user = userEvent.setup();
+    await renderDetail(buildJob({ job_id: 22, can_delete: true, songs: [] }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent("Delete job #22? This cannot be undone.");
+    expect(mockApi.delete).not.toHaveBeenCalled();
+  });
+
+  it("calls DELETE and navigates back to the jobs list on confirm", async () => {
+    mockApi.delete.mockResolvedValue({ data: { job_id: 22, status: "deleted" } });
+    const user = userEvent.setup();
+    await renderDetail(buildJob({ job_id: 22, can_delete: true, songs: [] }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: "Delete" }));
+
+    await waitFor(() => {
+      expect(mockApi.delete).toHaveBeenCalledWith("/jobs/22");
+      expect(pushMock).toHaveBeenCalledWith("/jobs");
+    });
+  });
+
+  it("does not delete when the dialog is cancelled", async () => {
+    const user = userEvent.setup();
+    await renderDetail(buildJob({ job_id: 23, can_delete: true, songs: [] }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+
+    expect(mockApi.delete).not.toHaveBeenCalled();
+    expect(pushMock).not.toHaveBeenCalled();
   });
 });
