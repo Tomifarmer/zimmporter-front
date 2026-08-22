@@ -25,9 +25,16 @@ type JobRowProps = {
   selectable?: boolean;
   checked?: boolean;
   onToggleSelect?: () => void;
+  onDelete?: () => void;
 };
 
-export default function JobRow({ job, selectable, checked, onToggleSelect }: JobRowProps) {
+export default function JobRow({
+  job,
+  selectable,
+  checked,
+  onToggleSelect,
+  onDelete,
+}: JobRowProps) {
   const pct = job.total_songs > 0 ? Math.round((job.songs_downloaded / job.total_songs) * 100) : 0;
   const isRunning = job.status === "running" || job.status === "pending";
   const isFailed = job.status === "failed";
@@ -66,7 +73,7 @@ export default function JobRow({ job, selectable, checked, onToggleSelect }: Job
             {selectable ? (
               <label
                 className="job-row-checkbox-wrapper"
-                title="Select to retry"
+                title="Select job"
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
               >
@@ -98,7 +105,24 @@ export default function JobRow({ job, selectable, checked, onToggleSelect }: Job
             {job.artist && <span className="job-row-artist">{job.artist}</span>}
             {job.album_name && <span className="job-row-album">{job.album_name}</span>}
           </div>
-          <StatusBadge status={displayStatus} />
+          <div className="job-row-top-actions">
+            <StatusBadge status={displayStatus} />
+            {onDelete && (
+              <button
+                type="button"
+                className="job-row-delete-btn"
+                title="Delete job"
+                aria-label={`Delete job #${job.job_id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete();
+                }}
+              >
+                <i className="pi pi-trash" />
+              </button>
+            )}
+          </div>
         </div>
 
         {job.total_songs > 0 && (

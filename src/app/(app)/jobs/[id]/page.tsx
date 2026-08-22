@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import { COLORS } from "@/config/colors";
@@ -31,6 +32,7 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
 
   const { data, isLoading, isError, error } = useJobPolling(jobId);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const retryMutation = useMutation({
     mutationFn: async () => {
@@ -40,6 +42,17 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["job", jobId] });
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await api.delete(`/jobs/${jobId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      queryClient.invalidateQueries({ queryKey: ["job-stats"] });
+      router.push("/jobs");
     },
   });
 
@@ -89,6 +102,36 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
       <div className="jd-title-row">
         <h1 className="jd-title">Job #{data.job_id}</h1>
         <StatusBadge status={displayStatus} />
+        {data.can_delete && (
+          <button
+            type="button"
+            onClick={() => {
+              if (window.confirm(`Delete job #${data.job_id}? This cannot be undone.`))
+                deleteMutation.mutate();
+            }}
+            disabled={deleteMutation.isPending}
+            className="jd-delete-btn"
+            style={
+              {
+                "--delete-bg": deleteMutation.isPending ? "#1e293b" : "transparent",
+                "--delete-cursor": deleteMutation.isPending ? "not-allowed" : "pointer",
+                "--delete-opacity": deleteMutation.isPending ? 0.5 : 1,
+              } as React.CSSProperties
+            }
+          >
+            {deleteMutation.isPending ? (
+              <>
+                <i className="pi pi-spin pi-spinner jd-delete-spinner" />
+                Deleting…
+              </>
+            ) : (
+              <>
+                <i className="pi pi-trash jd-trash-icon" />
+                Delete
+              </>
+            )}
+          </button>
+        )}
         {isRunning && (
           <span className="jd-polling-indicator">
             <span className="jd-polling-dot animate-pulse-fill" />
