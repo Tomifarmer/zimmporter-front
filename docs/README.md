@@ -4,17 +4,17 @@ Web interface for the Zimmporter music import API. Built with Next.js 16, TypeSc
 
 ## Stack
 
-| Package | Version |
-|---------|---------|
-| Next.js | 16.2.11 |
-| React | 19.2.8 |
-| TypeScript | ^6.0.3 |
-| PrimeReact | ^10.9.8 |
-| TanStack Query | ^5.101.4 |
-| Axios | ^1.18.1 |
-| NextAuth | ^5.0.0-beta.32 |
-| Bootstrap | ^5.3.8 |
-| PrimeIcons | 8.0.0 |
+| Package        | Version        |
+| -------------- | -------------- |
+| Next.js        | 16.2.11        |
+| React          | 19.2.8         |
+| TypeScript     | ^6.0.3         |
+| PrimeReact     | ^10.9.8        |
+| TanStack Query | ^5.101.4       |
+| Axios          | ^1.18.1        |
+| NextAuth       | ^5.0.0-beta.32 |
+| Bootstrap      | ^5.3.8         |
+| PrimeIcons     | 8.0.0          |
 
 ## Quick Start
 
@@ -29,19 +29,19 @@ npm run lint   # biome check (lint + format + imports)
 
 ## Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `API_URL` | No | `http://localhost:8000` | Backend API base URL (read at runtime via `/api/config`) |
-| `API_KEY` | No | `""` | API key sent as `X-API-Key` header when `USE_SIMPLE_AUTH=true` |
-| `USE_SOCIAL_LOGIN` | No | `false` | Enable social login (OIDC/GitHub) via NextAuth; proxy redirects to `/login` |
-| `USE_SIMPLE_AUTH` | No | `false` | Enable API key auth; sends `X-API-Key` header to backend |
-| `OIDC_NAME` | No | `"OIDC"` | Display name for the OIDC provider on the login button |
-| `OIDC_ISSUER_URL` | No | `""` | OIDC issuer URL (e.g. `https://accounts.google.com`) |
-| `OIDC_CLIENT_ID` | No | `""` | OIDC client ID |
-| `OIDC_CLIENT_SECRET` | No | `""` | OIDC client secret |
-| `GITHUB_CLIENT_ID` | No | `""` | GitHub OAuth App client ID |
-| `GITHUB_CLIENT_SECRET` | No | `""` | GitHub OAuth App client secret |
-| `AUTH_SECRET` | No | `"dev-secret-change-in-production"` | NextAuth encryption secret (generate with `openssl rand -base64 32`) |
+| Variable               | Required | Default                             | Description                                                                 |
+| ---------------------- | -------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| `API_URL`              | No       | `http://localhost:8000`             | Backend API base URL (read at runtime via `/api/config`)                    |
+| `API_KEY`              | No       | `""`                                | API key sent as `X-API-Key` header when `USE_SIMPLE_AUTH=true`              |
+| `USE_SOCIAL_LOGIN`     | No       | `false`                             | Enable social login (OIDC/GitHub) via NextAuth; proxy redirects to `/login` |
+| `USE_SIMPLE_AUTH`      | No       | `false`                             | Enable API key auth; sends `X-API-Key` header to backend                    |
+| `OIDC_NAME`            | No       | `"OIDC"`                            | Display name for the OIDC provider on the login button                      |
+| `OIDC_ISSUER_URL`      | No       | `""`                                | OIDC issuer URL (e.g. `https://accounts.google.com`)                        |
+| `OIDC_CLIENT_ID`       | No       | `""`                                | OIDC client ID                                                              |
+| `OIDC_CLIENT_SECRET`   | No       | `""`                                | OIDC client secret                                                          |
+| `GITHUB_CLIENT_ID`     | No       | `""`                                | GitHub OAuth App client ID                                                  |
+| `GITHUB_CLIENT_SECRET` | No       | `""`                                | GitHub OAuth App client secret                                              |
+| `AUTH_SECRET`          | No       | `"dev-secret-change-in-production"` | NextAuth encryption secret (generate with `openssl rand -base64 32`)        |
 
 `USE_SOCIAL_LOGIN` and `USE_SIMPLE_AUTH` cannot both be `true`; the app shows an error overlay if both are enabled.
 
@@ -51,13 +51,13 @@ Set in `.env.local` for local development, or via container environment at runti
 
 ## Pages
 
-| Route | Description |
-|-------|-------------|
-| `/` | Dashboard — system health cards, job stats, recent jobs |
-| `/search` | Search YouTube Music for albums, featured playlists, or community playlists — multi-select, batch download |
-| `/jobs` | Paginated jobs list with progress bars |
-| `/jobs/[id]` | Job detail — live polling (3s), songs table |
-| `/settings` | YouTube cookies management — upload cookies file for age-restricted downloads |
+| Route        | Description                                                                                                |
+| ------------ | ---------------------------------------------------------------------------------------------------------- |
+| `/`          | Dashboard — system health cards, job stats, recent jobs                                                    |
+| `/search`    | Search YouTube Music for albums, featured playlists, or community playlists — multi-select, batch download |
+| `/jobs`      | Paginated jobs list with progress bars                                                                     |
+| `/jobs/[id]` | Job detail — live polling (3s), songs table                                                                |
+| `/settings`  | YouTube cookies management — upload cookies file for age-restricted downloads                              |
 
 ### Dashboard (`/`)
 
@@ -205,12 +205,12 @@ The frontend is served on port `3000`, the API on port `8000`.
 
 GitHub Actions workflow at `.github/workflows/build.yml`:
 
-| Event | Tests | Build | Push image | Trivy scan |
-|---|---|---|---|---|
-| Push `main` | ✅ | — | — | — |
-| Push `feature/*` | ✅ | ✅ | `feature-*` | — |
-| Push tag `v*` | ✅ | ✅ | `latest`, semver | ✅ |
-| PR to `main` | ✅ | — | — | — |
+| Event            | Tests | Build | Push image       | Trivy scan |
+| ---------------- | ----- | ----- | ---------------- | ---------- |
+| Push `main`      | ✅    | —     | —                | —          |
+| Push `feature/*` | ✅    | ✅    | `feature-*`      | —          |
+| Push tag `v*`    | ✅    | ✅    | `latest`, semver | ✅         |
+| PR to `main`     | ✅    | —     | —                | —          |
 
 The `test` job runs `npm ci && npm run lint && npm test` on every trigger. The `build` job is gated to only build on tag or `feature/*` pushes; the `latest` and semver tags are only pushed on version tags, never from feature branches.
 

@@ -1,21 +1,24 @@
 # Zimmporter Frontend — Agent Notes
 
 ## Stack
+
 Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Query, axios, recharts (stats charts).
 
 ## Commands
-| Command | Purpose |
-|---|---|
-| `npm run dev` | Dev server on localhost:3000 |
-| `npm run build` | Production build |
-| `npm run lint` | Biome check (lint + format + imports) |
-| `npm run format` | Biome format --write |
-| `npm run lint:fix` | Biome check --write |
-| `npm run test` | Vitest (single run) |
-| `npm run test:watch` | Vitest (watch mode) |
-| `npm run test:coverage` | Vitest with coverage |
+
+| Command                 | Purpose                               |
+| ----------------------- | ------------------------------------- |
+| `npm run dev`           | Dev server on localhost:3000          |
+| `npm run build`         | Production build                      |
+| `npm run lint`          | Biome check (lint + format + imports) |
+| `npm run format`        | Biome format --write                  |
+| `npm run lint:fix`      | Biome check --write                   |
+| `npm run test`          | Vitest (single run)                   |
+| `npm run test:watch`    | Vitest (watch mode)                   |
+| `npm run test:coverage` | Vitest with coverage                  |
 
 ## Tests
+
 - **Framework:** Vitest + React Testing Library + jsdom
 - **API mocking:** `src/lib/api.ts` is auto-mocked via `vi.mock` in `src/__tests__/helpers/api-mock.ts`
 - **Mock factories:** `src/__tests__/helpers/factories.ts` provides builders for `SearchResult`, `JobStatusResponse`, `Song`
@@ -24,6 +27,7 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 - **Charts** — `src/__tests__/setup.ts` stubs `ResizeObserver` (recharts needs it under jsdom); the StatsPage test mocks recharts' `ResponsiveContainer` to inject fixed width/height
 
 ## Project Structure
+
 - `src/proxy.ts` — Next.js 16 proxy; redirects unauthenticated users to `/login` when `USE_SOCIAL_LOGIN=true`
 - `src/app/api/config/route.ts` — runtime config endpoint (reads `API_URL` and `API_KEY` from server env)
 - `src/app/` — App Router pages (`(app)/page.tsx`, `(app)/search/`, `(app)/jobs/`, `(app)/stats/`, `(app)/settings/`, `(auth)/login/`)
@@ -43,21 +47,22 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 Path alias: `@/*` maps to `src/*`.
 
 ## Environment Variables
+
 Set in `.env.local` or container environment at runtime.
 
-| Variable | Default | Description |
-|---|---|---|
-| `API_URL` | `http://localhost:8000` | Backend API base URL (read at runtime via `GET /api/config`) |
-| `API_KEY` | `""` | API key sent as `X-API-Key` header when `USE_SIMPLE_AUTH=true` |
-| `USE_SOCIAL_LOGIN` | `false` | Enable social login (OIDC/GitHub) via NextAuth; proxy redirects to `/login` |
-| `USE_SIMPLE_AUTH` | `false` | Enable API key auth; sends `X-API-Key` header to backend |
-| `OIDC_NAME` | `"OIDC"` | Display name for the OIDC provider on the login button |
-| `OIDC_ISSUER_URL` | `""` | OIDC issuer URL (e.g. `https://accounts.google.com`) |
-| `OIDC_CLIENT_ID` | `""` | OIDC client ID |
-| `OIDC_CLIENT_SECRET` | `""` | OIDC client secret |
-| `GITHUB_CLIENT_ID` | `""` | GitHub OAuth App client ID |
-| `GITHUB_CLIENT_SECRET` | `""` | GitHub OAuth App client secret |
-| `AUTH_SECRET` | `"dev-secret-change-in-production"` | NextAuth encryption secret (generate with `openssl rand -base64 32`) |
+| Variable               | Default                             | Description                                                                 |
+| ---------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| `API_URL`              | `http://localhost:8000`             | Backend API base URL (read at runtime via `GET /api/config`)                |
+| `API_KEY`              | `""`                                | API key sent as `X-API-Key` header when `USE_SIMPLE_AUTH=true`              |
+| `USE_SOCIAL_LOGIN`     | `false`                             | Enable social login (OIDC/GitHub) via NextAuth; proxy redirects to `/login` |
+| `USE_SIMPLE_AUTH`      | `false`                             | Enable API key auth; sends `X-API-Key` header to backend                    |
+| `OIDC_NAME`            | `"OIDC"`                            | Display name for the OIDC provider on the login button                      |
+| `OIDC_ISSUER_URL`      | `""`                                | OIDC issuer URL (e.g. `https://accounts.google.com`)                        |
+| `OIDC_CLIENT_ID`       | `""`                                | OIDC client ID                                                              |
+| `OIDC_CLIENT_SECRET`   | `""`                                | OIDC client secret                                                          |
+| `GITHUB_CLIENT_ID`     | `""`                                | GitHub OAuth App client ID                                                  |
+| `GITHUB_CLIENT_SECRET` | `""`                                | GitHub OAuth App client secret                                              |
+| `AUTH_SECRET`          | `"dev-secret-change-in-production"` | NextAuth encryption secret (generate with `openssl rand -base64 32`)        |
 
 `USE_SOCIAL_LOGIN` and `USE_SIMPLE_AUTH` cannot both be `true`; the app shows an error overlay if both are enabled.
 
@@ -66,5 +71,6 @@ Backend sibling repo: `../zimmporter-api`.
 Backend sibling repo: `../zimmporter-api`.
 
 ## Docker
+
 - `next.config.ts` sets `output: "standalone"` — Dockerfile uses multi-stage build, copies `.next/standalone` for a minimal production image.
 - Runtime image runs `node server.js` on port 3000.
