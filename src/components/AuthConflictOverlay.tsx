@@ -11,7 +11,7 @@ export default function AuthConflictOverlay({ conflict }: { conflict: boolean })
           className="d-inline-flex align-items-center justify-content-center rounded-circle mb-4"
           style={{ width: 72, height: 72, backgroundColor: "#ef444422" }}
         >
-          <i className="pi pi-exclamation-triangle text-danger" style={{ fontSize: "2rem" }} />
+          <i className="mi mi-exclamation-triangle text-danger" style={{ fontSize: "2rem" }} />
         </div>
         <h2 className="text-light mb-3">Authentication Configuration Error</h2>
         <p className="mb-4" style={{ color: "#cbd5e1" }}>

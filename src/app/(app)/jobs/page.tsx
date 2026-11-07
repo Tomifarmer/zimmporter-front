@@ -307,7 +307,7 @@ export default function JobsPage() {
 
       {jobsQuery.isLoading && (
         <div className="jobs-loading-wrapper">
-          <i className="pi pi-spin pi-spinner jobs-loading-icon" />
+          <i className="mi mi-spin mi-spinner jobs-loading-icon" />
         </div>
       )}
 
@@ -315,7 +315,7 @@ export default function JobsPage() {
 
       {!jobsQuery.isLoading && !jobsQuery.isError && filteredJobs.length === 0 && (
         <div className="jobs-empty-state">
-          <i className="pi pi-inbox jobs-empty-icon" />
+          <i className="mi mi-inbox jobs-empty-icon" />
           <span className="jobs-empty-text">
             {stats.total === 0
               ? "No jobs yet. Start a download from the search page."

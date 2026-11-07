@@ -369,7 +369,7 @@ describe("JobsPage delete", () => {
     expect(screen.getAllByTitle("Delete job")).toHaveLength(1);
   });
 
-  it("opens a PrimeReact confirmation dialog before deleting", async () => {
+  it("opens a Mantle UI confirmation dialog before deleting", async () => {
     mockApiGet([deletableJob(5)]);
     const user = userEvent.setup();
 

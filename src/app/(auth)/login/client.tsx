@@ -30,7 +30,7 @@ export default function LoginClient({ providers }: { providers: ProviderInfo[] }
               {p.icon.startsWith("/") ? (
                 <img src={p.icon} alt="" width="20" height="20" className="d-inline-block" />
               ) : (
-                <i className={`pi ${p.icon}`} />
+                <i className={`mi ${p.icon}`} />
               )}
               Sign in with {p.name}
             </button>

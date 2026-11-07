@@ -9,6 +9,9 @@ export default defineConfig({
     css: true,
   },
   resolve: {
+    // Resolve ESM builds so Vitest matches how Next.js bundles Mantle UI.
+    // Its CJS build does not expose the default config object (zIndex, etc.).
+    mainFields: ["module", "main"],
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },

@@ -1,4 +1,4 @@
-/* No PrimeReact theme is configured app-wide; style the mask here too. */
+/* No Mantle UI theme is configured app-wide; style the mask here too. */
 .p-dialog-mask {
   background-color: rgba(2, 6, 23, 0.65);
 }
@@ -44,7 +44,7 @@
   gap: 0.625rem;
 }
 
-/* Buttons are unstyled without a PrimeReact theme — theme blue for cancel, red for delete. */
+/* Buttons are unstyled without a Mantle UI theme — theme blue for cancel, red for delete. */
 .confirm-delete-dialog .p-button {
   font-size: 0.8125rem;
   font-weight: 600;

@@ -1,17 +1,17 @@
 "use client";
 
+import { Badge } from "@mantle-ui/react/badge";
+import { Card } from "@mantle-ui/react/card";
+import type { DropdownChangeEvent } from "@mantle-ui/react/dropdown";
+import { InputText } from "@mantle-ui/react/inputtext";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
-import { Badge } from "primereact/badge";
-import { Card } from "primereact/card";
-import type { DropdownChangeEvent } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import type { SearchResponse, SearchResult } from "@/types/api";
 
 const Dropdown = dynamic(
-  () => import("primereact/dropdown").then((mod) => mod.Dropdown || mod.default),
+  () => import("@mantle-ui/react/dropdown").then((mod) => mod.Dropdown || mod.default),
   { ssr: false },
 );
 
@@ -151,14 +151,14 @@ export default function SearchPage() {
               { label: "Community Playlists", value: "community_playlists" },
             ]}
             onChange={(e: DropdownChangeEvent) => setSearchType(e.value as SearchType)}
-            dropdownIcon="pi pi-chevron-down"
+            dropdownIcon="mi mi-chevron-down"
           />
         </div>
       </div>
 
       {searchResult.isLoading && (
         <div className="search-loading-wrapper">
-          <i className="pi pi-spin pi-spinner search-loading-icon" />
+          <i className="mi mi-spin mi-spinner search-loading-icon" />
         </div>
       )}
       {searchResult.isError && <div className="text-red-400">{searchResult.error.message}</div>}
@@ -194,12 +194,12 @@ export default function SearchPage() {
           >
             {searchResult.isFetching ? (
               <>
-                <i className="pi pi-spin pi-spinner search-btn-icon" />
+                <i className="mi mi-spin mi-spinner search-btn-icon" />
                 Loading…
               </>
             ) : (
               <>
-                <i className="pi pi-plus search-btn-plus" />
+                <i className="mi mi-plus search-btn-plus" />
                 Load More
               </>
             )}
@@ -224,7 +224,7 @@ export default function SearchPage() {
               } as React.CSSProperties
             }
           >
-            <i className="pi pi-download search-float-btn-icon" />
+            <i className="mi mi-download search-float-btn-icon" />
             {selected.size > 0 && <span className="search-float-badge">{selected.size}</span>}
           </button>
 
@@ -234,7 +234,7 @@ export default function SearchPage() {
             title="Concurrent downloads"
             className="search-settings-btn"
           >
-            <i className="pi pi-cog search-settings-icon" />
+            <i className="mi mi-cog search-settings-icon" />
           </button>
 
           {showSettings && (
@@ -299,7 +299,7 @@ function ResultCard({
         <div className="result-card-img-wrapper">
           {result.available && (
             <div className="result-card-available" title="Already in library">
-              <i className="pi pi-check-circle" />
+              <i className="mi mi-check-circle" />
             </div>
           )}
           {result.thumbnail && imageLoaded ? (
@@ -312,7 +312,7 @@ function ResultCard({
           ) : result.thumbnail && !imageFailed ? (
             <div className="result-card-img-placeholder">
               <div className="result-card-img-loading">
-                <i className="pi pi-spin pi-spinner result-card-spinner" />
+                <i className="mi mi-spin mi-spinner result-card-spinner" />
               </div>
               <img
                 key={retryCount}
@@ -326,7 +326,7 @@ function ResultCard({
             </div>
           ) : (
             <div className="result-card-fallback">
-              <i className="pi pi-music result-card-fallback-icon" />
+              <i className="mi mi-headphones result-card-fallback-icon" />
             </div>
           )}
         </div>
@@ -364,7 +364,7 @@ function ResultCard({
               rel="noopener noreferrer"
               title="See on YouTube Music"
             >
-              <i className="pi pi-youtube result-card-youtube" />
+              <i className="mi mi-youtube result-card-youtube" />
             </a>
           )}
         </div>

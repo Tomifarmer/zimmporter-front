@@ -205,7 +205,7 @@ describe("JobDetailPage delete", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("opens a PrimeReact confirmation dialog before deleting", async () => {
+  it("opens a Mantle UI confirmation dialog before deleting", async () => {
     const user = userEvent.setup();
     await renderDetail(buildJob({ job_id: 22, can_delete: true, songs: [] }));
 
