@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
+import { Button } from "@mantle-ui/react/button";
+import { Dialog } from "@mantle-ui/react/dialog";
 
 type ConfirmDeleteDialogProps = {
   visible: boolean;
@@ -26,7 +26,7 @@ export default function ConfirmDeleteDialog({
       <Button
         label="Delete"
         severity="danger"
-        icon="pi pi-trash"
+        icon="mi mi-trash"
         onClick={onConfirm}
         loading={pending}
       />
@@ -47,7 +47,7 @@ export default function ConfirmDeleteDialog({
       aria-labelledby="confirm-delete-header"
     >
       <div className="confirm-delete-dialog-body">
-        <i className="pi pi-exclamation-triangle confirm-delete-dialog-icon" aria-hidden="true" />
+        <i className="mi mi-exclamation-triangle confirm-delete-dialog-icon" aria-hidden="true" />
         <span id="confirm-delete-message">{message}</span>
       </div>
     </Dialog>

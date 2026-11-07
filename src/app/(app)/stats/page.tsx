@@ -44,7 +44,7 @@ function SummaryCard({ label, value, accent }: { label: string; value: number; a
 function EmptyState() {
   return (
     <div className="stats-empty-state">
-      <i className="pi pi-chart-bar stats-empty-icon" />
+      <i className="mi mi-chart-bar stats-empty-icon" />
       <span className="stats-empty-text">No data yet. Start a download from the search page.</span>
     </div>
   );
@@ -62,7 +62,7 @@ export default function StatsPage() {
   if (statsQuery.isLoading)
     return (
       <div className="stats-loading-wrapper">
-        <i className="pi pi-spin pi-spinner stats-loading-icon" />
+        <i className="mi mi-spin mi-spinner stats-loading-icon" />
       </div>
     );
   if (statsQuery.isError) return <div className="stats-error-box">{statsQuery.error.message}</div>;

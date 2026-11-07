@@ -67,7 +67,7 @@ export default function CookieManager() {
 
       {isLoading && (
         <div className="cookie-manager-loading">
-          <i className="pi pi-spin pi-spinner" />
+          <i className="mi mi-spin mi-spinner" />
         </div>
       )}
 
@@ -122,7 +122,7 @@ export default function CookieManager() {
             onClick={() => inputRef.current?.click()}
             className="cookie-manager-pick-btn"
           >
-            <i className="pi pi-folder-open cookie-manager-pick-icon" />
+            <i className="mi mi-folder-open cookie-manager-pick-icon" />
             Choose cookies file
           </button>
           <button
@@ -133,7 +133,7 @@ export default function CookieManager() {
           >
             {upload.isPending ? (
               <>
-                <i className="pi pi-spin pi-spinner cookie-manager-btn-icon" />
+                <i className="mi mi-spin mi-spinner cookie-manager-btn-icon" />
                 Uploading…
               </>
             ) : (

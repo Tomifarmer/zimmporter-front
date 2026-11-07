@@ -62,7 +62,7 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
   if (!resolved) {
     return (
       <div className="jobs-loading-wrapper">
-        <i className="pi pi-spin pi-spinner jobs-loading-icon" />
+        <i className="mi mi-spin mi-spinner jobs-loading-icon" />
       </div>
     );
   }
@@ -70,7 +70,7 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
   if (isLoading)
     return (
       <div className="jobs-loading-wrapper">
-        <i className="pi pi-spin pi-spinner jobs-loading-icon" />
+        <i className="mi mi-spin mi-spinner jobs-loading-icon" />
       </div>
     );
   if (isError) return <div className="jobs-error-box">{error.message}</div>;
@@ -97,7 +97,7 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
     <div className="space-y-6">
       <div className="jd-back-row">
         <a href="/jobs" className="jd-back-link">
-          <i className="pi pi-arrow-left jd-back-icon" />
+          <i className="mi mi-arrow-left jd-back-icon" />
           Jobs
         </a>
       </div>
@@ -119,7 +119,7 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
               } as React.CSSProperties
             }
           >
-            <i className="pi pi-trash jd-trash-icon" />
+            <i className="mi mi-trash jd-trash-icon" />
             Delete
           </button>
         )}
@@ -206,12 +206,12 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
           >
             {retryMutation.isPending ? (
               <>
-                <i className="pi pi-spin pi-spinner jd-retry-spinner" />
+                <i className="mi mi-spin mi-spinner jd-retry-spinner" />
                 Retrying…
               </>
             ) : (
               <>
-                <i className="pi pi-refresh jd-refresh-icon" />
+                <i className="mi mi-refresh jd-refresh-icon" />
                 {failedCount > 0
                   ? `Retry ${failedCount} failed song${failedCount > 1 ? "s" : ""}`
                   : "Retry job"}

@@ -26,7 +26,7 @@ export default function CookieStaleBanner() {
 
   return (
     <div className="cookie-stale-banner" role="alert">
-      <i className="pi pi-exclamation-triangle cookie-stale-icon" />
+      <i className="mi mi-exclamation-triangle cookie-stale-icon" />
       <span className="cookie-stale-text">
         Your YouTube cookies are stale or invalid, so downloads run without them. Re-export fresh
         cookies and upload them in{" "}
@@ -41,7 +41,7 @@ export default function CookieStaleBanner() {
         aria-label="Dismiss cookie warning"
         onClick={() => setDismissed(true)}
       >
-        <i className="pi pi-times" />
+        <i className="mi mi-times" />
       </button>
     </div>
   );

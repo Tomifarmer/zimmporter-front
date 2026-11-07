@@ -1,8 +1,8 @@
 "use client";
 
+import { Avatar } from "@mantle-ui/react/avatar";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { Avatar } from "primereact/avatar";
 import { useEffect, useState } from "react";
 import { getRuntimeConfig } from "@/lib/config";
 

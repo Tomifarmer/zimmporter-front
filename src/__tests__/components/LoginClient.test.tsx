@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LoginClient from "@/app/(auth)/login/client";
 
-const defaultProps = { providers: [{ id: "oidc", name: "Google", icon: "pi-google" }] };
+const defaultProps = { providers: [{ id: "oidc", name: "Google", icon: "mi-google" }] };
 
 const mockedUseSearchParams = vi.fn();
 
@@ -59,8 +59,8 @@ describe("LoginClient", () => {
     render(
       <LoginClient
         providers={[
-          { id: "oidc", name: "Google", icon: "pi-google" },
-          { id: "github", name: "GitHub", icon: "pi-github" },
+          { id: "oidc", name: "Google", icon: "mi-google" },
+          { id: "github", name: "GitHub", icon: "mi-github" },
         ]}
       />,
     );

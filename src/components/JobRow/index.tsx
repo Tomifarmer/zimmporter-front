@@ -119,7 +119,7 @@ export default function JobRow({
                   onDelete();
                 }}
               >
-                <i className="pi pi-trash" />
+                <i className="mi mi-trash" />
               </button>
             )}
           </div>

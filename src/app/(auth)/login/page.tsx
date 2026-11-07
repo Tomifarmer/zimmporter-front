@@ -21,9 +21,9 @@ export default async function LoginPage() {
     const name = process.env.OIDC_NAME || "";
     const issuer = process.env.OIDC_ISSUER_URL || "";
     const displayName = name || (issuer.includes("google") ? "Google" : "OIDC");
-    let icon = "pi-user";
+    let icon = "mi-user";
     if (issuer.includes("google")) {
-      icon = "pi-google";
+      icon = "mi-google";
     } else if (issuer.includes("authentik")) {
       icon = "/authentik.svg";
     }
@@ -31,7 +31,7 @@ export default async function LoginPage() {
   }
 
   if (process.env.GITHUB_CLIENT_ID) {
-    providers.push({ id: "github", name: "GitHub", icon: "pi-github" });
+    providers.push({ id: "github", name: "GitHub", icon: "mi-github" });
   }
 
   return <LoginClient providers={providers} />;

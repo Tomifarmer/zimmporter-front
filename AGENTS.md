@@ -2,7 +2,7 @@
 
 ## Stack
 
-Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Query, axios, recharts (stats charts).
+Next.js 16 (App Router), React 19, TypeScript, Mantle UI + Bootstrap, React Query, axios, recharts (stats charts).
 
 ## Commands
 
@@ -23,7 +23,7 @@ Next.js 16 (App Router), React 19, TypeScript, PrimeReact + Bootstrap, React Que
 - **API mocking:** `src/lib/api.ts` is auto-mocked via `vi.mock` in `src/__tests__/helpers/api-mock.ts`
 - **Mock factories:** `src/__tests__/helpers/factories.ts` provides builders for `SearchResult`, `JobStatusResponse`, `Song`
 - **Page tests** require a `QueryClient` wrapper — see existing page tests for pattern
-- **Dynamic imports** (e.g., `next/dynamic` for PrimeReact Dropdown) are mocked in page test files as needed
+- **Dynamic imports** (e.g., `next/dynamic` for Mantle UI Dropdown) are mocked in page test files as needed
 - **Charts** — `src/__tests__/setup.ts` stubs `ResizeObserver` (recharts needs it under jsdom); the StatsPage test mocks recharts' `ResponsiveContainer` to inject fixed width/height
 
 ## Project Structure
