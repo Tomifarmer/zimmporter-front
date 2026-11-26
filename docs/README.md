@@ -173,6 +173,7 @@ Next.js 16 middleware. When `USE_SOCIAL_LOGIN=true`, redirects unauthenticated u
 ### Auth (`src/lib/auth.ts`)
 
 NextAuth v5 configuration supporting:
+
 - **OIDC** — any OpenID Connect provider (Google, etc.)
 - **GitHub** — GitHub OAuth App
 - JWT strategy with `accessToken` passthrough and `picture` propagation from user profile to session
