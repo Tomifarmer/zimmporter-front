@@ -126,7 +126,7 @@ describe("StatsPage", () => {
   it("shows empty state when there is no data", async () => {
     mockApiGet(
       buildStats({
-        jobs: { total: 0, by_status: {}, by_type: { album: 0, playlist: 0 } },
+        jobs: { total: 0, by_status: {}, by_type: { album: 0, playlist: 0, single: 0 } },
         library: { albums: 0, playlists: 0, artists: 0, tracks: 0 },
         genres: [],
       }),
