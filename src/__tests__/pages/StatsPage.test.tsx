@@ -37,7 +37,7 @@ function buildStats(overrides?: Partial<StatsResponse>): StatsResponse {
     jobs: {
       total: 6,
       by_status: { success: 3, failed: 2, running: 1 },
-      by_type: { album: 4, playlist: 2 },
+      by_type: { album: 4, playlist: 2, single: 0 },
     },
     library: { albums: 12, playlists: 5, artists: 9, tracks: 148 },
     genres: [
@@ -83,7 +83,7 @@ describe("StatsPage", () => {
     await waitFor(() => {
       expect(screen.getByText("Jobs by status")).toBeInTheDocument();
     });
-    expect(screen.getByText("Jobs: album vs playlist")).toBeInTheDocument();
+    expect(screen.getByText("Jobs by type")).toBeInTheDocument();
     expect(screen.getByText("Genres")).toBeInTheDocument();
   });
 
@@ -126,7 +126,7 @@ describe("StatsPage", () => {
   it("shows empty state when there is no data", async () => {
     mockApiGet(
       buildStats({
-        jobs: { total: 0, by_status: {}, by_type: { album: 0, playlist: 0 } },
+        jobs: { total: 0, by_status: {}, by_type: { album: 0, playlist: 0, single: 0 } },
         library: { albums: 0, playlists: 0, artists: 0, tracks: 0 },
         genres: [],
       }),

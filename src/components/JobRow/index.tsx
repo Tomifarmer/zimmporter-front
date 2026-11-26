@@ -52,8 +52,13 @@ export default function JobRow({
         : isFailed
           ? "#ef4444"
           : "#475569";
-  const badgeBg = job.job_type === "album" ? `${COLORS.blue}22` : `${COLORS.turquoise}22`;
-  const badgeColor = job.job_type === "album" ? COLORS.blue : COLORS.turquoise;
+  const badgeColor =
+    job.job_type === "album"
+      ? COLORS.blue
+      : job.job_type === "single"
+        ? COLORS.green
+        : COLORS.turquoise;
+  const badgeBg = `${badgeColor}22`;
   const progressColor = isFailed
     ? "#ef4444"
     : isPartial

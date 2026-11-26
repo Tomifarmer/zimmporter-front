@@ -150,7 +150,13 @@ function JobDetailContent({ jobIdPromise }: { jobIdPromise: Promise<{ id: string
         </div>
         <div className="col-12 col-sm-6">
           <InfoBox
-            label={data.job_type === "playlist" ? "Playlist" : "Album"}
+            label={
+              data.job_type === "playlist"
+                ? "Playlist"
+                : data.job_type === "single"
+                  ? "Track"
+                  : "Album"
+            }
             value={data.album_name || data.current_album || "\u2014"}
           />
         </div>
