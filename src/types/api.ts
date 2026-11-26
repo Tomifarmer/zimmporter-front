@@ -6,6 +6,7 @@ export interface SearchResult {
   year?: string;
   type?: string;
   artist?: string[];
+  album?: string;
   author?: string;
   duration?: string;
   thumbnail?: string;
@@ -37,7 +38,7 @@ export interface Song {
 
 export interface JobStatusResponse {
   job_id: number;
-  job_type: "album" | "playlist";
+  job_type: "album" | "playlist" | "single";
   browse_id: string;
   status: "pending" | "running" | "success" | "failed";
   message: string;
@@ -81,7 +82,7 @@ export interface StatsResponse {
   jobs: {
     total: number;
     by_status: Record<string, number>;
-    by_type: { album: number; playlist: number };
+    by_type: { album: number; playlist: number; single: number };
   };
   library: {
     albums: number;

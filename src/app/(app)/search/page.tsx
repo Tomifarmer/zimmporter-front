@@ -15,7 +15,14 @@ const Dropdown = dynamic(
   { ssr: false },
 );
 
-type SearchType = "albums" | "featured_playlists" | "community_playlists";
+type SearchType = "albums" | "songs" | "featured_playlists" | "community_playlists";
+
+const SEARCH_TYPE_BADGES: Record<SearchType, { value: string; title: string }> = {
+  albums: { value: "A", title: "Album selected" },
+  songs: { value: "S", title: "Song selected" },
+  featured_playlists: { value: "F", title: "Featured Playlists selected" },
+  community_playlists: { value: "C", title: "Community Playlists selected" },
+};
 
 const LIMIT_DEFAULT = 10;
 const LIMIT_MAX = 50;
@@ -46,7 +53,12 @@ export default function SearchPage() {
   const downloadMutation = useMutation({
     mutationFn: async () => {
       const browseIds = Array.from(selected);
-      const endpoint = searchType === "albums" ? "/download/album" : "/download/playlist";
+      const endpoint =
+        searchType === "albums"
+          ? "/download/album"
+          : searchType === "songs"
+            ? "/download/single"
+            : "/download/playlist";
       const requests = browseIds.map((id) =>
         api.post<{ job_id: number; status: string }>(endpoint, { id, concurrent }),
       );
@@ -64,13 +76,13 @@ export default function SearchPage() {
     downloadMutation.mutate();
   }, [downloadMutation]);
 
-  const toggleSelect = (browseId: string) => {
+  const toggleSelect = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(browseId)) {
-        next.delete(browseId);
+      if (next.has(id)) {
+        next.delete(id);
       } else {
-        next.add(browseId);
+        next.add(id);
       }
       return next;
     });
@@ -117,14 +129,8 @@ export default function SearchPage() {
     <div className="space-y-6">
       <div className="search-bar-row">
         <Badge
-          value={searchType === "albums" ? "A" : searchType === "featured_playlists" ? "F" : "C"}
-          title={
-            searchType === "albums"
-              ? "Album selected"
-              : searchType === "featured_playlists"
-                ? "Featured Playlists selected"
-                : "Community Playlists selected"
-          }
+          value={SEARCH_TYPE_BADGES[searchType].value}
+          title={SEARCH_TYPE_BADGES[searchType].title}
           className="search-type-badge"
         />
         <div className="search-input-wrapper">
@@ -133,7 +139,7 @@ export default function SearchPage() {
             className="search-text-input"
             value={query}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
-            placeholder="Search for albums or playlists..."
+            placeholder="Search for albums, songs, or playlists..."
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -147,10 +153,14 @@ export default function SearchPage() {
             value={searchType}
             options={[
               { label: "Albums", value: "albums" },
+              { label: "Songs", value: "songs" },
               { label: "Featured Playlists", value: "featured_playlists" },
               { label: "Community Playlists", value: "community_playlists" },
             ]}
-            onChange={(e: DropdownChangeEvent) => setSearchType(e.value as SearchType)}
+            onChange={(e: DropdownChangeEvent) => {
+              setSearchType(e.value as SearchType);
+              setSelected(new Set());
+            }}
             dropdownIcon="mi mi-chevron-down"
           />
         </div>
@@ -176,8 +186,11 @@ export default function SearchPage() {
             >
               <ResultCard
                 result={result}
-                checked={selected.has(result.browseId || "")}
-                onChange={() => result.browseId && toggleSelect(result.browseId)}
+                checked={selected.has(result.browseId || result.videoId || "")}
+                onChange={() => {
+                  const id = result.browseId || result.videoId;
+                  if (id) toggleSelect(id);
+                }}
               />
             </div>
           ))}
@@ -338,7 +351,13 @@ function ResultCard({
             {artist}
           </div>
           <div className="result-card-meta">
-            {[result.year, result.type, result.trackCount && `${result.trackCount} songs`]
+            {[
+              result.year,
+              result.type,
+              result.album,
+              result.duration,
+              result.trackCount && `${result.trackCount} songs`,
+            ]
               .filter(Boolean)
               .join(" • ") || "\u00a0"}
           </div>
@@ -357,9 +376,13 @@ function ResultCard({
               {checked && <span className="result-card-checkmark">{"\u2713"}</span>}
             </span>
           </label>
-          {result.browseId && (
+          {(result.browseId || result.videoId) && (
             <a
-              href={`https://music.youtube.com/browse/${result.browseId}`}
+              href={
+                result.browseId
+                  ? `https://music.youtube.com/browse/${result.browseId}`
+                  : `https://music.youtube.com/watch?v=${result.videoId}`
+              }
               target="_blank"
               rel="noopener noreferrer"
               title="See on YouTube Music"

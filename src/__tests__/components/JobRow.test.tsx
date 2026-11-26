@@ -11,6 +11,12 @@ describe("JobRow", () => {
     expect(screen.getByText("playlist")).toBeInTheDocument();
   });
 
+  it("renders a single job type badge", () => {
+    const job = buildJob({ job_type: "single" });
+    render(<JobRow job={job} />);
+    expect(screen.getByText("single")).toBeInTheDocument();
+  });
+
   it("renders artist and album name when provided", () => {
     const job = buildJob({ artist: "Some Artist", album_name: "Some Album" });
     render(<JobRow job={job} />);

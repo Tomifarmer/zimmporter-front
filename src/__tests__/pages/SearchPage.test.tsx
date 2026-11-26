@@ -6,8 +6,22 @@ import { buildSearchResponse, buildSearchResult } from "@/__tests__/helpers/fact
 
 vi.mock("next/dynamic", () => ({
   default: () => {
-    const MockDynamic = (props: Record<string, unknown>) => (
-      <div data-testid="dynamic-component" {...props} />
+    const MockDynamic = (props: {
+      value?: string;
+      options?: { label: string; value: string }[];
+      onChange?: (e: { value: string }) => void;
+    }) => (
+      <select
+        data-testid="dynamic-component"
+        value={props.value}
+        onChange={(e) => props.onChange?.({ value: e.target.value })}
+      >
+        {props.options?.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     );
     MockDynamic.displayName = "DynamicComponent";
     return MockDynamic;
@@ -41,7 +55,9 @@ describe("SearchPage", () => {
   it("renders the search input and type badge", async () => {
     const SearchPage = await importSearchPage();
     render(<SearchPage />, { wrapper: createWrapper() });
-    expect(screen.getByPlaceholderText("Search for albums or playlists...")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Search for albums, songs, or playlists..."),
+    ).toBeInTheDocument();
     expect(screen.getByTitle("Album selected")).toBeInTheDocument();
   });
 
@@ -56,7 +72,7 @@ describe("SearchPage", () => {
     const SearchPage = await importSearchPage();
     render(<SearchPage />, { wrapper: createWrapper() });
 
-    const input = screen.getByPlaceholderText("Search for albums or playlists...");
+    const input = screen.getByPlaceholderText("Search for albums, songs, or playlists...");
     await user.type(input, "test query");
     await user.keyboard("{Enter}");
 
@@ -73,7 +89,7 @@ describe("SearchPage", () => {
     const SearchPage = await importSearchPage();
     render(<SearchPage />, { wrapper: createWrapper() });
 
-    const input = screen.getByPlaceholderText("Search for albums or playlists...");
+    const input = screen.getByPlaceholderText("Search for albums, songs, or playlists...");
     await user.type(input, "empty query");
     await user.keyboard("{Enter}");
 
@@ -89,7 +105,7 @@ describe("SearchPage", () => {
     const SearchPage = await importSearchPage();
     render(<SearchPage />, { wrapper: createWrapper() });
 
-    const input = screen.getByPlaceholderText("Search for albums or playlists...");
+    const input = screen.getByPlaceholderText("Search for albums, songs, or playlists...");
     await user.type(input, "fail");
     await user.keyboard("{Enter}");
 
@@ -106,7 +122,7 @@ describe("SearchPage", () => {
     const SearchPage = await importSearchPage();
     render(<SearchPage />, { wrapper: createWrapper() });
 
-    const input = screen.getByPlaceholderText("Search for albums or playlists...");
+    const input = screen.getByPlaceholderText("Search for albums, songs, or playlists...");
     await user.type(input, "select");
     await user.keyboard("{Enter}");
 
@@ -129,7 +145,7 @@ describe("SearchPage", () => {
     const SearchPage = await importSearchPage();
     render(<SearchPage />, { wrapper: createWrapper() });
 
-    const input = screen.getByPlaceholderText("Search for albums or playlists...");
+    const input = screen.getByPlaceholderText("Search for albums, songs, or playlists...");
     await user.type(input, "download");
     await user.keyboard("{Enter}");
 
@@ -145,6 +161,47 @@ describe("SearchPage", () => {
     });
   });
 
+  it("posts to /download/single when downloading a song", async () => {
+    const user = userEvent.setup();
+    const results = [
+      buildSearchResult({
+        resultType: "song",
+        browseId: undefined,
+        videoId: "vid_song_001",
+        title: "Single Song",
+        artist: ["Song Artist"],
+        album: "Song Album",
+        duration: "3:45",
+      }),
+    ];
+    mockApiGet(buildSearchResponse({ results }));
+    mockApiPost({ job_id: 42, status: "pending" });
+
+    const SearchPage = await importSearchPage();
+    render(<SearchPage />, { wrapper: createWrapper() });
+
+    await user.selectOptions(screen.getByTestId("dynamic-component"), "songs");
+    expect(screen.getByTitle("Song selected")).toBeInTheDocument();
+
+    const input = screen.getByPlaceholderText("Search for albums, songs, or playlists...");
+    await user.type(input, "song");
+    await user.keyboard("{Enter}");
+
+    await waitFor(() => {
+      expect(screen.getByText("Single Song")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("checkbox"));
+    await user.click(screen.getByTitle("Start download"));
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith("/download/single", {
+        id: "vid_song_001",
+        concurrent: 4,
+      });
+    });
+  });
+
   it("shows green check badge for already-available albums", async () => {
     const user = userEvent.setup();
     const results = [
@@ -156,7 +213,7 @@ describe("SearchPage", () => {
     const SearchPage = await importSearchPage();
     render(<SearchPage />, { wrapper: createWrapper() });
 
-    const input = screen.getByPlaceholderText("Search for albums or playlists...");
+    const input = screen.getByPlaceholderText("Search for albums, songs, or playlists...");
     await user.type(input, "available");
     await user.keyboard("{Enter}");
 
@@ -176,7 +233,7 @@ describe("SearchPage", () => {
     const SearchPage = await importSearchPage();
     render(<SearchPage />, { wrapper: createWrapper() });
 
-    const input = screen.getByPlaceholderText("Search for albums or playlists...");
+    const input = screen.getByPlaceholderText("Search for albums, songs, or playlists...");
     await user.type(input, "settings");
     await user.keyboard("{Enter}");
 

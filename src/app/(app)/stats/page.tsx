@@ -30,6 +30,7 @@ const STATUS_COLORS: Record<string, string> = {
 const TYPE_COLORS = {
   album: "#3b82f6",
   playlist: "#40e0d0",
+  single: "#22c55e",
 };
 
 function SummaryCard({ label, value, accent }: { label: string; value: number; accent: string }) {
@@ -70,7 +71,8 @@ export default function StatsPage() {
 
   const { jobs, library, genres, top_users = [] } = statsQuery.data;
 
-  const hasData = jobs.total > 0 || library.albums > 0 || library.playlists > 0;
+  const hasData =
+    jobs.total > 0 || library.albums > 0 || library.playlists > 0 || library.tracks > 0;
   if (!hasData) return <EmptyState />;
 
   const statusData = Object.entries(jobs.by_status)
@@ -81,6 +83,7 @@ export default function StatsPage() {
     [
       { name: "album", value: jobs.by_type.album },
       { name: "playlist", value: jobs.by_type.playlist },
+      { name: "single", value: jobs.by_type.single },
     ] as { name: keyof typeof TYPE_COLORS; value: number }[]
   ).filter((d) => d.value > 0);
 
@@ -148,7 +151,7 @@ export default function StatsPage() {
         </div>
 
         <div className="stats-chart-card">
-          <h2 className="stats-chart-title">Jobs: album vs playlist</h2>
+          <h2 className="stats-chart-title">Jobs by type</h2>
           {typeData.length > 0 ? (
             <div className="stats-chart-donut">
               <ResponsiveContainer width="100%" height="100%">
