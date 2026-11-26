@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
@@ -65,8 +65,7 @@ describe("ConfirmDeleteDialog", () => {
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it("disables interaction while pending", async () => {
-    const user = userEvent.setup();
+  it("disables interaction while pending", () => {
     const onCancel = vi.fn();
     render(
       <ConfirmDeleteDialog
@@ -79,8 +78,13 @@ describe("ConfirmDeleteDialog", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
-    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    const cancelButton = screen.getByRole("button", { name: "Cancel" });
+    expect(cancelButton).toBeDisabled();
+
+    // jsdom 31 computes `pointer-events: none` for disabled buttons, so
+    // user-event refuses the click. Dispatch it directly to verify that the
+    // handler is not invoked while pending.
+    fireEvent.click(cancelButton);
     expect(onCancel).not.toHaveBeenCalled();
   });
 });
